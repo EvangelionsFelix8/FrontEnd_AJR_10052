@@ -1,7 +1,6 @@
 <template>
     <v-main class="list">
         <h3 style="font-size: 50px" mb-5> Jadwal </h3>
-
         <v-card>
             <v-card-title>
                 <v-text-field

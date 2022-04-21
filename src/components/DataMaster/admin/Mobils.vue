@@ -46,8 +46,24 @@
         
         <v-card style='margin-top: 20px'>
             <v-data-table :headers="headers" :items="mobils" :search="search">
-                <template v-slot:[`item.url_foto_mobil`]="{item}">
+                <!-- <template v-slot:[`item.url_foto_mobil`]="{item}">
                     <v-img :src="$baseUrl+'/storage/'+item.url_foto_mobil" height="100px" width="200px" style="object-fit:cover"/> 
+                </template> -->
+                <template v-slot:[`item.jenis_bahan_bakar`]="{item}">
+                    <span v-if="item.jenis_bahan_bakar == 'Pertalite'"><strong style="color: green">Pertalite</strong></span>
+                    <span v-else><strong style="color: blue">Pertamax</strong> </span>
+                </template>
+                <template v-slot:[`item.volume_bahan_bakar`]="{item}">
+                    <span>
+                        {{ item.volume_bahan_bakar }} L</span>
+                </template>
+                <template v-slot:[`item.kapasitas_penumpang`]="{item}">
+                    <span>
+                        {{ item.kapasitas_penumpang }} Orang</span>
+                </template>
+                <template v-slot:[`item.harga_sewa_mobil`]="{item}">
+                    <span>
+                        Rp. {{ item.harga_sewa_mobil }}</span>
                 </template>
                 <template v-slot:[`item.kategori_aset`]="{item}">
                     <span v-if="item.id_mitra == null"><v-chip label color="blue lighten-4" text-color="blue darken-4"><strong>Perusahaan</strong></v-chip></span>
@@ -55,6 +71,10 @@
                 </template>
                 <template v-slot:[`item.status_ketersediaan`]="{item}">
                     <span v-if="item.status_ketersediaan == 'Tersedia'"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Tersedia</strong></v-chip></span>
+                    <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Tersedia</strong></v-chip> </span>
+                </template>
+                <template v-if="temp_sisa" v-slot:[`item.sisa_hari`]="{item}">
+                    <span v-if="item.sisa_hari < 30 || item.sisa_hari > 0"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Tersedia</strong></v-chip></span>
                     <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Tersedia</strong></v-chip> </span>
                 </template>
                 <template v-slot:[`item.actions`]= "{ item }">
@@ -69,6 +89,7 @@
                             </v-tooltip>
                         </template>
                         <v-list>
+                            <v-list-item-title><v-btn style="min-width: 100px;" small @click="detailScreen(item)"> Detail </v-btn></v-list-item-title>
                             <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
                             <v-list-item-title><v-btn class="red--text" red style="min-width: 100px;" small @click="deleteHandler(item.id_mobil)"> Delete </v-btn></v-list-item-title>
                         </v-list>
@@ -91,6 +112,7 @@
                 <v-card-text>
                     <v-container>
                         <v-select :items="mitras" clearable v-model="form.id_mitra" label="Mitra" item-value="id_mitra" item-text="nama_mitra"></v-select>
+                        <v-text-field v-model="form.nama_mobil" label="Nama Mobil" required></v-text-field>
                         <v-select :items="tipeMobils" v-model="form.tipe_mobil" label="Tipe Mobil" item-value="tipe_mobil" item-text="text"></v-select>
                         <v-select :items="jenisTransmisis" v-model="form.jenis_transmisi" label="Jenis Transmisi" item-value="value" item-text="text"></v-select>
                         <v-select :items="jenisBahanBakars" v-model="form.jenis_bahan_bakar" label="Jenis Bahan Bakar" item-value="value" item-text="text"></v-select>
@@ -104,8 +126,8 @@
                         <v-select :items="statusKetersediaans" v-model="form.status_ketersediaan" label="Status Tersedia" item-value="value" item-text="text"></v-select>
                         <v-file-input rounded filled prepend-icon="mdi-camera" label="Foto Mobil" id="file" ref="fileGambar"></v-file-input>
                         <v-text-field v-model="form.fasilitas" label="Fasilitas Mobil" required></v-text-field>
-                        <v-text-field type="date" v-model="form.mulai_kontrak" label="Mulai Kontrak Mobil" required></v-text-field>
-                        <v-text-field type="date" v-model="form.selesai_kontrak" label="Selesai Kontrak Mobil" required></v-text-field>
+                        <v-text-field clearable type="date" v-model="form.mulai_kontrak" label="Mulai Kontrak Mobil" required></v-text-field>
+                        <v-text-field clearable type="date" v-model="form.selesai_kontrak" label="Selesai Kontrak Mobil" required></v-text-field>
                         <v-text-field type="date" v-model="form.tanggal_servis_terakhir" label="Tanggal Service terakhir Mobil" required></v-text-field>
                     </v-container>
                 </v-card-text>
@@ -136,6 +158,50 @@
             </v-card>
         </v-dialog>
 
+        <!-- DRAWER BUAT DETAIL -->
+                <v-navigation-drawer absolute temporary hide-overlay right v-model="drawer" height="550" class="fullheight">
+                    <template>
+                        <!-- <v-list-item two-line>
+                        <v-list-item-avatar>
+                            <v-img :src="$baseUrl+'/storage/'+this.form.url_foto_driver" height="100px" width="200px" style="object-fit:cover"/> 
+                        </v-list-item-avatar>-->
+<!-- 
+                        <v-list-item-content>
+                            <v-list-item-title>Name: {{this.form.nama_driver}}</v-list-item-title>
+                        </v-list-item-content> -->
+                        <!-- </v-list-item>  -->
+                        <v-app-bar fixed color="#00396c">
+                            <h2 style="color: white;">Detail Mobil : <span style="margin-left: 205px"><v-icon color="white" @click="drawer = !drawer">mdi-close-thick </v-icon></span></h2> 
+                            <!-- <h6>Name: </h6> -->
+                        </v-app-bar>
+                    </template>
+                    
+
+                    <v-divider></v-divider>
+
+                    <v-list style="padding-left: 20px;">
+                        <v-list-item-content>
+                            <v-list-item-title style="margin-top: 60px; margin-left: 40px;">
+                                <!-- <v-overlay> -->
+                                    <v-img @click="overlay = !overlay" :src="$baseUrl+'/storage/'+this.data.url_foto_mobil" height="150px" width="300px" style="object-fit:cover"/> 
+                                <!-- </v-overlay> -->
+                            </v-list-item-title>
+                            <v-list-item-title style="margin-top: 20px; margin-bottom: 20px;"><strong> Nama Mobil <span style="margin-left: 97px;"> :</span> </strong> {{this.data.nama_mobil}}</v-list-item-title>
+                            <v-list-item-title style="margin-bottom: 20px;"><strong> Plat Nomor <span style="margin-left: 103px;"> :</span> </strong> {{this.data.plat_nomor}}</v-list-item-title>
+                                <!-- <v-list-item-title style="margin-bottom: 20px;">
+                                    <strong> Fasilitas<span style="margin-left: 123px;"> :</span> </strong> {{this.data.fasilitas}}</v-list-item-title> -->
+                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Mulai Kontrak <span style="margin-left: 23px;"> :</span> </strong> {{this.data.mulai_kontrak}}</v-list-item-title>
+                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Selesai Kontrak <span style="margin-left: 10px;"> :</span> </strong> {{this.data.selesai_kontrak}}</v-list-item-title>
+                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Servis Terakhir <span style="margin-left: 15px;"> :</span> </strong> {{this.data.tanggal_servis_terakhir}}</v-list-item-title>
+                            <v-list-item-title style="margin-bottom: 20px;"><strong> Sisa Kontrak <span style="margin-left: 95px;"> :</span> </strong> 
+                                <span v-if="this.data.sisa_hari > 0"> <span  style="color: red; font-weight: bold;"> {{this.data.sisa_hari}}</span> Hari Lagi  </span>
+                                <span v-else-if="this.data.sisa_hari == null"> <v-chip style="margin-left: 20px" label color="green lighten-4" text-color="green darken-4"> <strong> Unlimited </strong> </v-chip></span>
+                                <span v-else> <v-chip style="margin-left: 20px" label color="red lighten-4" text-color="red darken-4"> <strong> Expired </strong> </v-chip></span>
+                            </v-list-item-title>
+                        </v-list-item-content>
+                    </v-list>
+                </v-navigation-drawer>
+
         <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
             {{ error_message }}
         </v-snackbar>
@@ -153,26 +219,29 @@
                 snackbar: false,
                 error_message: '',
                 color: '',
+                temp_sisa: '',
                 search: null,
                 dialog: false,
                 dialogConfirm: false,
+                drawer: false,
                 headers: [
-                    { text: "", value: 'url_foto_mobil' },
-                    { text: "Nama Mobil", value: 'nama_mobil' },
+                    // { text: "", value: 'url_foto_mobil' },
+                    { text: "Nama Mobil", value: 'nama_mobil', width: '150px' },
                     { text: "Tipe Mobil", value: 'tipe_mobil' },
                     { text: "Transmisi", value: 'jenis_transmisi' },
                     { text: "Bahan Bakar", value: 'jenis_bahan_bakar' },
                     { text: "Warna ", value: 'warna_mobil' },
-                    { text: "Volume Bahan Bakar (L)", value: 'volume_bahan_bakar' },
+                    { text: "Volume Bahan Bakar", value: 'volume_bahan_bakar' },
                     { text: "Kapasitas", value: 'kapasitas_penumpang' },
-                    { text: "Harga Mobil", value: 'harga_sewa_mobil' },
-                    { text: "Plat Nomor", value: 'plat_nomor' },
-                    { text: "Fasilitas Mobil", value: 'fasilitas' },
-                    { text: "Mulai Kontrak Mobil", value: 'mulai_kontrak' },
-                    { text: "Selesai Kontrak Mobil", value: 'selesai_kontrak' },
-                    { text: "Tanggal servis Terakhir", value: 'tanggal_servis_terakhir' },
+                    { text: "Harga Mobil", value: 'harga_sewa_mobil', width: '125px' },
+                    // { text: "Plat Nomor", value: 'plat_nomor' },
+                    { text: "Fasilitas Mobil", value: 'fasilitas', width: '150px' },
+                    // { text: "Mulai Kontrak Mobil", value: 'mulai_kontrak' },
+                    // { text: "Selesai Kontrak Mobil", value: 'selesai_kontrak' },
+                    // { text: "Tanggal servis Terakhir", value: 'tanggal_servis_terakhir' },
                     { text: "Kategori Aset", value: 'kategori_aset' },
                     { text: "Status Mobil", value: 'status_ketersediaan' },
+                    // { text: "Sisa Hari Kontrak", value: 'sisa_hari'},
                     { text: "Action", value: 'actions' },
                 ],
 
@@ -204,6 +273,26 @@
                     {text: "Tidak Tersedia", value: 'Tidak Tersedia'},
                 ],
                 form: {
+                    id_mitra: [],
+                    nama_mobil: null,
+                    tipe_mobil: null,
+                    jenis_transmisi: null,
+                    jenis_bahan_bakar: null,
+                    warna_mobil: null,
+                    volume_bahan_bakar: null,
+                    kategori_aset: null,
+                    kapasitas_penumpang: null,
+                    harga_sewa_mobil: null,
+                    plat_nomor: null,
+                    nomor_stnk: null,
+                    status_ketersediaan: null,
+                    url_foto_mobil: null,
+                    fasilitas: null,
+                    mulai_kontrak: [],
+                    selesai_kontrak: [],
+                    tanggal_servis_terakhir: null,
+                },
+                data: {
                     id_mitra: [],
                     nama_mobil: null,
                     tipe_mobil: null,
@@ -265,6 +354,29 @@
                 })
             },
 
+            isAktifOn () {
+                var url = this.$api + '/showbystatusmobil';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.mobils = response.data.data;
+                })
+            },
+
+            getExpireSoon () {
+                this.temp_sisa = true;
+                var url = this.$api + '/getmobilbyexpiredsoon';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.mobils = response.data.data;
+                })
+            },
+
             save(){
                 if(this.form.id_mitra > 0){
                     this.mobil.append('id_mitra', this.form.id_mitra);
@@ -286,8 +398,20 @@
                 this.mobil.append('nomor_stnk', this.form.nomor_stnk);
                 this.mobil.append('status_ketersediaan', this.form.status_ketersediaan);
                 this.mobil.append('fasilitas', this.form.fasilitas);
-                this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
-                this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
+                if(this.form.mulai_kontrak !== null){
+                    this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
+                }
+                else{
+                    this.mobil.append('mulai_kontrak', 'null');
+                }
+                // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
+                if(this.form.selesai_kontrak !== null){
+                   this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
+                }
+                else{
+                    this.mobil.append('selesai_kontrak', 'null');
+                }
+                // this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
                 this.mobil.append('tanggal_servis_terakhir', this.form.tanggal_servis_terakhir);
 
                 var temp_foto = document.getElementById("file");
@@ -342,8 +466,21 @@
                 this.mobil.append('status_ketersediaan', this.form.status_ketersediaan);
                 // this.mobil.append('url_foto_mobil', this.form.url_foto_mobil);
                 this.mobil.append('fasilitas', this.form.fasilitas);
-                this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
-                this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
+                if(this.form.mulai_kontrak !== null){
+                    this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
+                }
+                else{
+                    this.mobil.append('mulai_kontrak', []);
+                }
+                // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
+                if(this.form.selesai_kontrak !== null){
+                   this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
+                }
+                else{
+                    this.mobil.append('selesai_kontrak', []);
+                }
+                // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
+                // this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
                 this.mobil.append('tanggal_servis_terakhir', this.form.tanggal_servis_terakhir);
 
                 var url = this.$api + '/mobil/' + this.editId;
@@ -440,34 +577,39 @@
 
             resetForm(){
                 this.form = {
-                    kode_promo : null,
-                    jenis_promo : null,
-                    besar_diskon_promo : null,
-                    status_promo : null,
-                    keterangan : null,
+                    nama_mobil: null,
+                    tipe_mobil: null,
+                    jenis_transmisi: null,
+                    jenis_bahan_bakar: null,
+                    warna_mobil: null,
+                    volume_bahan_bakar: null,
+                    kategori_aset: null,
+                    kapasitas_penumpang: null,
+                    harga_sewa_mobil: null,
+                    plat_nomor: null,
+                    nomor_stnk: null,
+                    status_ketersediaan: null,
+                    url_foto_mobil: null,
+                    fasilitas: null,
+                    mulai_kontrak: null,
+                    selesai_kontrak: null,
+                    tanggal_servis_terakhir: null,
                 };
             },
 
-            isAktifOn () {
-                var url = this.$api + '/showbystatusmobil';
-                this.$http.get(url, {
-                    headers: {
-                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
-                    }
-                }).then(response => {
-                    this.mobils = response.data.data;
-                })
-            },
-
-            getExpireSoon () {
-                var url = this.$api + '/getmobilbyexpiredsoon';
-                this.$http.get(url, {
-                    headers: {
-                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
-                    }
-                }).then(response => {
-                    this.mobils = response.data.data;
-                })
+            detailScreen(item){
+                this.data.url_foto_mobil = item.url_foto_mobil;
+                this.data.nama_mobil = item.nama_mobil;
+                this.data.plat_nomor = item.plat_nomor;
+                this.data.fasilitas = item.fasilitas;
+                this.data.mulai_kontrak = item.mulai_kontrak;
+                this.data.selesai_kontrak = item.selesai_kontrak;
+                this.data.tanggal_servis_terakhir = item.tanggal_servis_terakhir;
+                this.data.sisa_hari = item.sisa_hari;
+                this.drawer = !this.drawer;
+                if(this.drawer == false){
+                    this.resetForm();
+                }
             },
         },
 
@@ -483,3 +625,10 @@
         },
     };
 </script>
+
+<style scoped>
+    .fullheight {
+        /* min-height: 100vh !important; */
+        min-width: 65vh !important;
+    }
+</style>

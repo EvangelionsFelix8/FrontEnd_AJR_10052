@@ -37,12 +37,24 @@
         </v-chip-group>
         
         <!-- <v-overlay :value="overlay"><v-img @click="overlay = !overlay" :src="$baseUrl+'/storage/'+this.form.url_foto_driver" height="100px" width="200px" style="object-fit:cover"/> </v-overlay> -->
+        <v-overlay :value="overlay">
+            <v-app-bar color="#00396c" max-height="50" max-width="550">
+                <h2 style="color: white; margin-bottom: 8px;">Foto Profil Driver </h2> <v-icon @click="overlay = !overlay" style="margin-bottom: 10px; margin-left: 310px;">mdi-close-thick</v-icon>
+            </v-app-bar>
+            <v-img :src="$baseUrl+'/storage/'+this.BUATBANTUFOTO" height="550px" width="550px" />
+        </v-overlay> 
         <v-card style='margin-top: 20px'>
             <v-data-table :headers="headers" :items="drivers" :search="search">
                 <template v-slot:[`item.url_foto_driver`]="{item}">
                     <v-avatar>
-                        <v-img :src="$baseUrl+'/storage/'+item.url_foto_driver" height="100px" width="200px" style="object-fit:cover"/> 
+                        <v-img @click="OverlayPreview(item)" :src="$baseUrl+'/storage/'+item.url_foto_driver" height="100px" width="200px" style="object-fit:cover"/> 
                     </v-avatar>
+                    <!-- <v-overlay :value="overlay">
+                        <v-app-bar color="#00396c" max-height="50">
+                            <v-icon @click="overlay = !overlay" style="margin-bottom: 10px; margin-left: 550px;">mdi-close-thick</v-icon>
+                        </v-app-bar>
+                        <v-img :src="$baseUrl+'/storage/'+item.url_foto_driver" height="400px" width="610px" /> 
+                    </v-overlay> -->
                 </template>
                 <template v-slot:[`item.tarif_sewa_driver`]="{item}">
                     <span>
@@ -204,7 +216,7 @@
                         </v-list-item-content> -->
                         <!-- </v-list-item>  -->
                         <v-app-bar fixed color="#00396c">
-                            <h2 style="color: white;">Detail Driver : <span style="margin-left: 205px"><v-icon color="white" @click="drawer = !drawer">mdi-close-thick </v-icon></span></h2> 
+                            <h2 style="color: white;">Detail Driver : <span style="margin-left: 230px"><v-icon color="white" @click="closeDrawerDetail">mdi-close-thick </v-icon></span></h2> 
                             <!-- <h6>Name: </h6> -->
                         </v-app-bar>
                     </template>
@@ -221,19 +233,34 @@
                             <v-list-item-title style="margin-bottom: 20px;"><strong> Jenis Kelamin <span style="margin-left: 56px;"> :</span> </strong> {{this.data.jenis_kelamin}}</v-list-item-title>
                             <v-list-item-title style="margin-bottom: 10px;"><strong> Berkas Bebas Napza <span style="margin-left: 10px;"> :</span> </strong> </v-list-item-title>
                             <v-list-item-title>
-                                <!-- <v-overlay> -->
-                                    <v-img @click="overlay = !overlay" :src="$baseUrl+'/storage/'+this.data.berkas_bebas_napza" height="200px" width="300px" style="object-fit:cover"/> 
-                                <!-- </v-overlay> -->
+                                <v-img :src="$baseUrl+'/storage/'+this.data.berkas_bebas_napza" height="500px" width="400px" style="object-fit:cover"/> 
+                            
                             </v-list-item-title>
 
                             <v-list-item-title style="margin-top: 20px; margin-bottom: 10px;"><strong> Berkas SIM <span style="margin-left: 75px;"> :</span> </strong> </v-list-item-title>
-                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_sim" height="200px" width="300px" style="object-fit:cover"/> </v-list-item-title>
+                            <v-list-item-title>
+                                <v-img :src="$baseUrl+'/storage/'+this.data.berkas_sim" height="500px" width="400px" style="object-fit:cover"/>
+                                <!-- <v-overlay :value="overlay_sim">
+                                    <v-app-bar color="#00396c" max-height="50">
+                                        <v-icon @click="overlay_sim = !overlay_sim" style="margin-bottom: 10px; margin-left: 350px;">mdi-close-thick</v-icon>
+                                    </v-app-bar>
+                                    <v-img :src="$baseUrl+'/storage/'+this.data.berkas_sim" height="400px" width="410px" />
+                                </v-overlay>  -->
+                            </v-list-item-title>
                             <v-list-item-title style="margin-top: 20px; margin-bottom: 10px;"><strong> Berkas Sehat Jiwa <span style="margin-left: 25px;"> :</span> </strong> </v-list-item-title>
-                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_sehat_jiwa" height="200px" width="300px" style="object-fit:cover"/> </v-list-item-title>
+                            <v-list-item-title>
+                                <v-img :src="$baseUrl+'/storage/'+this.data.berkas_sehat_jiwa" height="500px" width="400px" style="object-fit:cover"/>
+                                <!-- <v-overlay :value="overlay_jiwa">
+                                    <v-app-bar color="#00396c" max-height="50">
+                                        <v-icon @click="overlay_jiwa = !overlay_jiwa" style="margin-bottom: 10px; margin-left: 350px;">mdi-close-thick</v-icon>
+                                    </v-app-bar>
+                                    <v-img :src="$baseUrl+'/storage/'+this.data.berkas_sehat_jiwa" height="400px" width="410px" />
+                                </v-overlay>  -->
+                            </v-list-item-title>
                             <v-list-item-title style="margin-top: 20px; margin-bottom: 10px;"><strong> Berkas Sehat Jasmani : </strong> </v-list-item-title>
-                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_sehat_jasmani" height="200px" width="300px" style="object-fit:cover"/> </v-list-item-title>
+                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_sehat_jasmani" height="500px" width="400px" style="object-fit:cover"/> </v-list-item-title>
                             <v-list-item-title style="margin-top: 20px; margin-bottom: 10px;"><strong> Berkas SKCK <span style="margin-left: 65px;"> :</span> </strong> </v-list-item-title>
-                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_skck" height="200px" width="300px" style="object-fit:cover"/> </v-list-item-title>
+                            <v-list-item-title><v-img :src="$baseUrl+'/storage/'+this.data.berkas_skck" height="500px" width="400px" style="object-fit:cover"/> </v-list-item-title>
                             <span style="margin-top: 20px;" v-if="this.data.status_berkas == 'Verified'">
                                 <strong>Status Berkas <span style="margin-left: 60px;"> :</span></strong><v-chip style="margin-left: 20px" label color="green lighten-4" text-color="green darken-4"><strong>Verified</strong></v-chip></span>
                             <span style="margin-top: 20px;" v-else>
@@ -241,6 +268,13 @@
                         </v-list-item-content>
                     </v-list>
                 </v-navigation-drawer>
+        <!-- <v-overlay :value="overlay_napza">
+            <v-img :src="$baseUrl+'/storage/'+this.BANTUNAPZA" height="400px" width="610px" />
+        </v-overlay>
+
+        <v-overlay :value="overlay_sim">
+            <v-img :src="$baseUrl+'/storage/'+this.BANTUSIM" height="400px" width="410px" />
+        </v-overlay>  -->
 
         <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
             {{ error_message }}
@@ -263,9 +297,19 @@
                 error_message: '',
                 color: '',
                 BUATBANTUFOTO: '',
+                BANTUNAPZA: '',
+                BANTUSIM: '',
+                BANTUJIWA: '',
+                BANTUJASMANI: '',
+                BANTUSKCK: '',
                 drawer: null,
                 previewImageUrl: '',
                 overlay: false,
+                overlay_napza: null,
+                overlay_sim: null,
+                overlay_jiwa: null,
+                overlay_jasmani: null,
+                overlay_skck: null,
                 items: [
                 { title: 'Home', icon: 'mdi-view-dashboard' },
                 { title: 'About', icon: 'mdi-forum' },
@@ -375,7 +419,6 @@
                     this.update();
                 }
                 else{
-                   
                     this.save();
                 }
                 
@@ -456,6 +499,7 @@
                     this.close();
                     this.readData();
                     this.resetForm();
+                    location.reload();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
@@ -517,6 +561,7 @@
                     this.readData();
                     this.resetForm();
                     this.inputType = 'Tambah';
+                    location.reload();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
@@ -583,14 +628,12 @@
             verifyBerkasHandler(item){
                 this.editId = item.id_driver;
                 this.form.status_berkas = item.status_berkas;
-                console.log(this.form.status_berkas);
                 this.dialogVerifikasi = true;
             },
 
             verifyBerkas(){
                 if(this.form.status_berkas == 'Not Verified'){
                     this.driver.append('status_berkas', 'Verified');
-                    console.log("Masuk SINI");
                     var url = this.$api + '/updateberkasdriver/' + this.editId;
                     this.load = true;
                     this.$http.post(url, this.driver, {
@@ -642,6 +685,7 @@
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
+                location.reload();
                 this.readData();
             },
 
@@ -651,7 +695,8 @@
                 this.dialog = false;
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
-                this.inputType = 'Tambah';
+                // this.inputType = 'Tambah';
+                location.reload();
             },
 
             resetForm(){
@@ -678,7 +723,29 @@
                 };
             },
 
-            
+            closeDrawerDetail(){
+                this.drawer = !this.drawer;
+                this.overlay_napza = !this.overlay_napza;
+                this.overlay_sim = !this.overlay_sim;
+                this.overlay_jiwa = !this.overlay_jiwa;
+                this.overlay_jasmani = !this.overlay_jasmani;
+                this.overlay_skck = !this.overlay_skck;
+            },
+
+            OverlayPreview(item){
+                this.BUATBANTUFOTO = item.url_foto_driver;
+                this.overlay = !this.overlay;
+            },
+
+            OverlayNapza(item){
+                this.BANTUNAPZA = item.berkas_bebas_napza;
+                this.overlay_napza = !this.overlay_napza;
+            },
+
+            OverlaySim(item){
+                this.BANTUSIM = item.berkas_sim;
+                this.overlay_napza = !this.overlay_napza;
+            },
         },
 
         computed: {
@@ -695,11 +762,8 @@
 </script>
 
 <style scoped>
-    #myTable table thead tr th:nth-child(1) {
-        background: green;
-    }
     .fullheight {
         /* min-height: 100vh !important; */
-        min-width: 65vh !important;
+        min-width: 70vh !important;
     }
 </style>

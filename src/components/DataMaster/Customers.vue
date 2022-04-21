@@ -36,11 +36,27 @@
             > Active only</v-chip>
         </v-chip-group>
         
+        <v-overlay :value="overlay_tanda">
+            <v-app-bar color="#00396c" max-height="50" max-width="550">
+                <h2 style="color: white; margin-bottom: 8px;">Foto Tanda Pengenal </h2> <v-icon @click="overlay_tanda = !overlay_tanda" style="margin-bottom: 10px; margin-left: 260px;">mdi-close-thick</v-icon>
+            </v-app-bar>
+            <v-img :src="$baseUrl+'/storage/'+this.BANTUPENGENAL" height="550px" width="550px" />
+        </v-overlay>
+        <v-overlay :value="overlay_sim">
+            <v-app-bar color="#00396c" max-height="50" max-width="550">
+                <h2 style="color: white; margin-bottom: 8px;">Foto SIM </h2> <v-icon @click="overlay_sim = !overlay_sim" style="margin-bottom: 10px; margin-left: 390px;">mdi-close-thick</v-icon>
+            </v-app-bar>
+            <v-img :src="$baseUrl+'/storage/'+this.BANTUSIM" height="550px" width="550px" />
+        </v-overlay>
+
         <v-card style='margin-top: 20px'>
             <v-data-table :headers="headers" :items="customers" :search="search">
-                <!-- <template v-slot:[`item.url_foto_pegawai`]="{item}">
-                    <v-img :src="$baseUrl+'/storage/'+item.url_foto_pegawai" height="100px" width="100px" style="object-fit:cover"/>  
-                </template> -->
+                <template v-slot:[`item.no_tanda_pengenal`]="{item}">
+                    <v-img @click="OverlayTandaPreview(item)" :src="$baseUrl+'/storage/'+item.no_tanda_pengenal" height="100px" width="100px" style="object-fit:cover"/>  
+                </template>
+                <template v-slot:[`item.no_sim`]="{item}">
+                    <v-img @click="OverlaySimPreview(item)" :src="$baseUrl+'/storage/'+item.no_sim" height="100px" width="100px" style="object-fit:cover"/>  
+                </template>
                 <template v-slot:[`item.status_berkas`]="{item}">
                     <span v-if="item.status_berkas == 'Verified'"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Verified</strong></v-chip></span>
                     <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Not Verified</strong></v-chip> </span>
@@ -57,11 +73,11 @@
                             </v-tooltip>
                         </template>
                         <v-list>
+                            <v-list-item-title><v-btn style="min-width: 100px;" small @click="verifyBerkasHandler(item)"> Verifikasi </v-btn></v-list-item-title>
                             <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
-                            <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_pegawai)"> Delete </v-btn></v-list-item-title>
+                            <!-- <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_pegawai)"> Delete </v-btn></v-list-item-title> -->
                         </v-list>
                     </v-menu>
-                   
                 </template>
             </v-data-table>
         </v-card>
@@ -116,6 +132,28 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="dialogVerifikasi" persistent max-width="400px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Warning!</span>
+                </v-card-title>
+
+                <v-card-text>
+                    Anda ingin Verifikasi Berkas Customer ini?
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="dialogVerifikasi = false"> No </v-btn>
+                    <v-btn color="blue darken-1" text @click="verifyBerkas"> Yes </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-snackbar v-model="snackbarSudahVerifikasi" :color="color" timeout="2000" top>
+            Anda Sudah Verifikasi Customer ini
+        </v-snackbar>
+
         <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
             {{ error_message }}
         </v-snackbar>
@@ -133,9 +171,14 @@
                 snackbar: false,
                 error_message: '',
                 color: '',
+                overlay_tanda: false,
+                overlay_sim: false,
+                BANTUPENGENAL: '',
+                BANTUSIM: '',
                 search: null,
                 dialog: false,
                 dialogConfirm: false,
+                dialogVerifikasi: false,
                 statusPegawai: [
                     {text: "Aktif", value: 1},
                     {text: "Tidak Aktif", value: 0},
@@ -143,12 +186,11 @@
                 previewImageUrl: '',
                 headers: [
                     { text: "Nama Customer", value: 'nama_customer' },
-                    { text: "Alamat Customer", value: 'alamat_customer' },
+                    { text: "Alamat Customer", value: 'alamat_customer', width: "150px" },
                     { text: "Email Customer", value: 'email_customer' },
-                    { text: "Tanggal Lahir", value: 'tanggal_lahir_customer' },
+                    { text: "Tanggal Lahir", value: 'tanggal_lahir_customer', width: "110px" },
                     { text: "Jenis Kelamin", value: 'jenis_kelamin' },
                     { text: "No. Telp Customer", value: 'no_telp_customer' },
-                    { text: "Berkas Customer", value: 'berkas_customer' },
                     { text: "Tanda Pengenal Customer", value: 'no_tanda_pengenal' },
                     { text: "SIM Customer", value: 'no_sim' },
                     { text: "Status Berkas", value: 'status_berkas' },
@@ -221,42 +263,89 @@
                 })
             },
 
-            save(){
-                this.customer.append('id_role', this.form.id_role);
-                this.customer.append('nama_pegawai', this.form.nama_pegawai);
-                this.customer.append('email_pegawai', this.form.email_pegawai);
-                this.customer.append('tanggal_lahir_pegawai', this.form.tanggal_lahir_pegawai);
-                this.customer.append('jenis_kelamin_pegawai', this.form.jenis_kelamin_pegawai);
-                this.customer.append('no_telp_pegawai', this.form.no_telp_pegawai);
-                this.customer.append('jenis_kelamin_pegawai', this.form.jenis_kelamin_pegawai);
-                this.customer.append('url_foto_pegawai', this.form.url_foto_pegawai);
-                this.customer.append('isAktif', this.form.isAktif);
+            // save(){
+            //     this.customer.append('id_role', this.form.id_role);
+            //     this.customer.append('nama_pegawai', this.form.nama_pegawai);
+            //     this.customer.append('email_pegawai', this.form.email_pegawai);
+            //     this.customer.append('tanggal_lahir_pegawai', this.form.tanggal_lahir_pegawai);
+            //     this.customer.append('jenis_kelamin_pegawai', this.form.jenis_kelamin_pegawai);
+            //     this.customer.append('no_telp_pegawai', this.form.no_telp_pegawai);
+            //     this.customer.append('jenis_kelamin_pegawai', this.form.jenis_kelamin_pegawai);
+            //     this.customer.append('url_foto_pegawai', this.form.url_foto_pegawai);
+            //     this.customer.append('isAktif', this.form.isAktif);
 
 
-                var url = this.$api + '/customer/'
-                this.load = true;
-                this.$http.post(url, this.customer, {
-                    headers: {
-                        'Authorization' : 'Bearer ' + localStorage.getItem('token'),
-                    }
-                }).then(response => {
-                    this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
-                    this.load = true;
-                    this.close();
-                    this.readData();
-                    this.resetForm();
-                }).catch(error => {
-                    this.error_message = error.response.data.message;
-                    this.color = "red";
-                    this.snackbar = true;
-                    this.load = false;
-                });
-            },
+            //     var url = this.$api + '/customer/'
+            //     this.load = true;
+            //     this.$http.post(url, this.customer, {
+            //         headers: {
+            //             'Authorization' : 'Bearer ' + localStorage.getItem('token'),
+            //         }
+            //     }).then(response => {
+            //         this.error_message = response.data.message;
+            //         this.color = "green";
+            //         this.snackbar = true;
+            //         this.load = true;
+            //         this.close();
+            //         this.readData();
+            //         this.resetForm();
+            //     }).catch(error => {
+            //         this.error_message = error.response.data.message;
+            //         this.color = "red";
+            //         this.snackbar = true;
+            //         this.load = false;
+            //     });
+            // },
 
             onPreviewImage(e) {
                 this.previewImageUrl = URL.createObjectURL(e)
+            },
+
+            OverlayTandaPreview(item){
+                this.BANTUPENGENAL = item.no_tanda_pengenal;
+                this.overlay_tanda = !this.overlay_tanda;
+            },
+
+            verifyBerkasHandler(item){
+                this.editId = item.id_customer;
+                this.form.status_berkas = item.status_berkas;
+                this.dialogVerifikasi = true;
+            },
+
+            verifyBerkas(){
+                if(this.form.status_berkas == 'Not Verified'){
+                    this.customer.append('status_berkas', 'Verified');
+                    var url = this.$api + '/updateberkascustomer/' + this.editId;
+                    this.load = true;
+                    this.$http.post(url, this.customer, {
+                        headers: {
+                            'Authorization' : 'Bearer ' +localStorage.getItem('token')
+                        }
+                    }).then(response => {
+                        this.error_message = response.data.message;
+                        this.color = "green";
+                        this.snackbar = true;
+                        this.load = false;
+                        this.close();
+                        this.readData();
+                        this.resetForm();
+                    }).catch(error => {
+                        this.error_message = error.response.data.message;
+                        this.color = "red";
+                        this.snackbar = true;
+                        this.load = false;
+                    });
+                }
+                else{
+                    this.color = "primary";
+                    this.dialogVerifikasi = false;
+                    this.snackbarSudahVerifikasi = true;
+                }
+            },
+
+            OverlaySimPreview(item){
+                this.BANTUSIM = item.no_sim;
+                this.overlay_sim = !this.overlay_sim;
             },
 
             update() {
@@ -344,6 +433,7 @@
                 this.dialog = false;
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
+                this.dialogVerifikasi = false;
                 this.readData();
             },
 

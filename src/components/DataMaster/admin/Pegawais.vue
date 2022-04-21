@@ -36,12 +36,19 @@
             > Active only</v-chip>
         </v-chip-group>
         
+        <v-overlay :value="overlay">
+            <v-app-bar color="#00396c" max-height="50" max-width="550">
+                <h2 style="color: white; margin-bottom: 8px;">Foto Profil Pegawai </h2> <v-icon @click="overlay = !overlay" style="margin-bottom: 10px; margin-left: 280px;">mdi-close-thick</v-icon>
+            </v-app-bar>
+            <v-img :src="$baseUrl+'/storage/'+this.BUATBANTUFOTO" height="550px" width="550px" />
+        </v-overlay> 
         <v-card style='margin-top: 20px'>
             <v-data-table :headers="headers" :items="pegawais" :search="search">
                 <template v-slot:[`item.url_foto_pegawai`]="{item}">
                     <v-avatar>
-                        <v-img :src="$baseUrl+'/storage/'+item.url_foto_pegawai" height="100px" width="100px" style="object-fit:cover"/>
-                    </v-avatar>  
+                        <v-img @click="OverlayPreview(item)" :src="$baseUrl+'/storage/'+item.url_foto_pegawai" height="100px" width="100px" style="object-fit:cover"/>
+                    </v-avatar> 
+                    
                 </template>
                 <template v-slot:[`item.isAktif`]="{item}">
                     <span v-if="item.isAktif == 1"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Aktif</strong></v-chip></span>
@@ -135,7 +142,9 @@
                 snackbar: false,
                 error_message: '',
                 color: '',
+                BUATBANTUFOTO: '',
                 search: null,
+                overlay: false,
                 dialog: false,
                 dialogConfirm: false,
                 urlFoto: null,
@@ -379,6 +388,11 @@
                     url_foto_pegawai: null,
                     isAktif: null,
                 };
+            },
+
+            OverlayPreview(item){
+                this.BUATBANTUFOTO = item.url_foto_pegawai;
+                this.overlay = !this.overlay;
             },
         },
 
