@@ -48,7 +48,6 @@
                     <v-avatar>
                         <v-img @click="OverlayPreview(item)" :src="$baseUrl+'/storage/'+item.url_foto_pegawai" height="100px" width="100px" style="object-fit:cover"/>
                     </v-avatar> 
-                    
                 </template>
                 <template v-slot:[`item.isAktif`]="{item}">
                     <span v-if="item.isAktif == 1"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Aktif</strong></v-chip></span>
@@ -87,15 +86,18 @@
                 </v-toolbar>
                 <v-card-text>
                     <v-container>
-                        <v-select :items="roles" v-model="form.id_role" label="Jabatan" item-value="id_role" item-text="nama_role"></v-select>
-                        <v-text-field v-model="form.nama_pegawai" label="Nama Pegawai" required></v-text-field>
-                        <v-textarea v-model="form.alamat_pegawai" label="Alamat Pegawai" required></v-textarea>
-                        <v-text-field v-model="form.email_pegawai" label="Email pegawai" required></v-text-field>
-                        <v-text-field :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)" type="date" v-model="form.tanggal_lahir_pegawai" label="Tanggal Lahir" required></v-text-field>
-                        <v-select :items="jenisKelamin" v-model="form.jenis_kelamin_pegawai" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
-                        <v-text-field v-model="form.no_telp_pegawai" label="No. Telp Pegawai" required></v-text-field>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Foto Pegawai" id="file" ref="fileGambar"></v-file-input>
-                        <v-select :items="statusPegawai" v-model="form.isAktif" label="Status Pegawai" item-value="value" item-text="text"></v-select>
+                        <v-form v-model="valid" ref="form">
+                            <v-select :rules="messageRules" :items="roles" v-model="form.id_role" label="Jabatan" item-value="id_role" item-text="nama_role"></v-select>
+                            <v-text-field :rules="messageRules" v-model="form.nama_pegawai" label="Nama Pegawai" required></v-text-field>
+                            <v-textarea :rules="messageRules" v-model="form.alamat_pegawai" label="Alamat Pegawai" required></v-textarea>
+                            <v-text-field :rules="messageRules" v-model="form.email_pegawai" label="Email pegawai" required></v-text-field>
+                            <v-text-field :rules="messageRules" :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)" type="date" v-model="form.tanggal_lahir_pegawai" label="Tanggal Lahir" required></v-text-field>
+                            <v-select :rules="messageRules" :items="jenisKelamin" v-model="form.jenis_kelamin_pegawai" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
+                            <v-text-field :rules="messageRules" v-model="form.no_telp_pegawai" label="No. Telp Pegawai" required></v-text-field>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Foto Pegawai" id="file" ref="fileGambar"></v-file-input>
+                            <!-- <input type="file" rounded filled prepend-icon="mdi-camera" label="Foto Pegawai" id="file" ref="fileGambar"><input> -->
+                            <v-select :rules="messageRules" :items="statusPegawai" v-model="form.isAktif" label="Status Pegawai" item-value="value" item-text="text"></v-select>
+                        </v-form>
                     </v-container>
                 </v-card-text>
 
@@ -125,8 +127,27 @@
             </v-card>
         </v-dialog>
 
-        <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
-            {{ error_message }}
+        <v-snackbar v-model="snackbar.visible" auto-height :color="snackbar.color" :multi-line="snackbar.mode === 'multi-line'" :timeout="snackbar.timeout" :top="snackbar.position === 'bottom'">
+            <v-layout align-center pr-4>
+                <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+                <v-layout column>
+                <div>
+                    <strong>{{ snackbar.title }}</strong>
+                </div>
+                <div>{{ error_message }}</div>
+                </v-layout>
+            </v-layout>
+            <v-btn v-if="snackbar.timeout === 0" icon @click="snackbar.visible = false">
+                <v-icon>clear</v-icon>
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
+            <div v-for="(errorArray, index) in error_message" :key="index">
+                <div v-for="(error_message, index) in errorArray" :key="index">
+                    {{ error_message }}
+                </div>
+            </div>
         </v-snackbar>
 
     </v-main>
@@ -139,7 +160,16 @@
             return {
                 inputType: 'Tambah',
                 load: false,
-                snackbar: false,
+                snackbar1: false,
+                snackbar: {
+                    color: null,
+                    icon: null,
+                    mode: null,
+                    position: "bottom",
+                    timeout: 2000,
+                    title: null,
+                    visible: false
+                },
                 error_message: '',
                 color: '',
                 BUATBANTUFOTO: '',
@@ -148,13 +178,17 @@
                 dialog: false,
                 dialogConfirm: false,
                 urlFoto: null,
+                valid: false,
+                messageRules: [
+                    (v) => !!v || 'This Field is Required !',
+                ],
                 jenisKelamin: [
                     {text: "Laki - Laki", value: "laki-laki"},
                     {text: "Perempuan", value: "perempuan"},
                 ],
                 statusPegawai: [
                     {text: "Aktif", value: 1},
-                    {text: "Tidak Aktif", value: 0},
+                    {text: "Tidak Aktif", value: 2},
                 ],
                 previewImageUrl: '',
                 headers: [
@@ -194,6 +228,12 @@
             };
         },
         methods: {
+            clear(){
+                this.$refs.form.reset();
+                // this.$refs.form.value = null;
+                // this.$refs.fileGambar.value = null;
+                // this.$refs.fileGambar.reset();
+            },
             setForm() {
                 if(this.inputType !== 'Tambah'){
                     this.update();
@@ -258,17 +298,26 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = true;
                     this.close();
                     this.readData();
                     this.resetForm();
+                    location.reload();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
+                    // this.clear();
                 });
             },
 
@@ -299,17 +348,28 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = false;
                     this.close();
+                    this.clear();
+                    if(temp_foto.files[0]){
+                        location.reload();
+                    }
                     this.readData();
                     this.resetForm();
                     this.inputType = 'Tambah';
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
                 });
             },
@@ -324,8 +384,15 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = false;
                     this.close();
                     this.readData();
@@ -333,9 +400,19 @@
                     this.inputType = "Tambah";
                 }).catch(error => {
                     this.error_message = error.response.data.message;
-                    this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "error",
+                        icon: "mdi-alert-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Error",
+                        visible: true
+                    };
+                    // this.color = "red";
+                    // this.snackbar1 = true;
                     this.load = false;
+                    this.clear();
                 });
             },
 
@@ -370,6 +447,12 @@
             cancel() {
                 this.resetForm();
                 this.readData();
+
+                var temp_foto = document.getElementById("file");
+                if(temp_foto.files[0]){
+                    location.reload();
+                }
+                this.clear();
                 this.dialog = false;
                 this.dialogConfirm = false;
                 this.inputType = 'Tambah';
@@ -388,6 +471,10 @@
                     url_foto_pegawai: null,
                     isAktif: null,
                 };
+                // this.$refs.form.reset();
+                // this.$refs.form.value = null;
+                // // this.$refs.fileGambar.value = null;
+                // // this.$refs.fileGambar.reset();
             },
 
             OverlayPreview(item){

@@ -38,6 +38,9 @@
         
         <v-card style='margin-top: 20px'>
             <v-data-table :headers="headers" :items="promos" :search="search">
+                <template v-slot:[`item.besar_diskon_promo`]="{item}">
+                    <span>{{item.besar_diskon_promo}}%</span>
+                </template>
                 <template v-slot:[`item.status_promo`]="{item}">
                     <span v-if="item.status_promo == 'Aktif'"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Aktif</strong></v-chip></span>
                     <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Aktif</strong></v-chip> </span>
@@ -77,18 +80,20 @@
                 </v-toolbar>
                 <v-card-text>
                     <v-container>
-                        <v-text-field v-model="form.kode_promo" label="Kode Promo" required></v-text-field>
-                        <v-text-field v-model="form.jenis_promo" label="Jenis Promo" required></v-text-field>
-                        <v-text-field v-model="form.besar_diskon_promo" label="Besar Diskon Promo" required></v-text-field>
-                        <v-select :items="statusPromo" v-model="form.status_promo" label="Status Promo" item-value="statusPromo" item-text="text"></v-select>
-                        <v-textarea v-model="form.keterangan" label="Keterangan" required></v-textarea>
+                        <v-form v-model="valid" ref="form">
+                            <v-text-field v-model="form.kode_promo" label="Kode Promo" :rules="messageRules" required></v-text-field>
+                            <v-text-field v-model="form.jenis_promo" label="Jenis Promo" :rules="messageRules" required></v-text-field>
+                            <v-text-field v-model="form.besar_diskon_promo" label="Besar Diskon Promo" :rules="messageRules" required></v-text-field>
+                            <v-select :items="statusPromo" v-model="form.status_promo" :rules="messageRules" label="Status Promo" item-value="statusPromo" item-text="text"></v-select>
+                            <v-textarea v-model="form.keterangan" label="Keterangan" :rules="messageRules" required></v-textarea>
+                        </v-form>
                     </v-container>
                 </v-card-text>
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="cancel"> Cancel </v-btn>
-                    <v-btn color="blue darken-1" text @click="setForm"> Save </v-btn>
+                    <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" text @click="setForm"> Save </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -111,8 +116,27 @@
             </v-card>
         </v-dialog>
 
-        <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
-            {{ error_message }}
+        <v-snackbar v-model="snackbar.visible" auto-height :color="snackbar.color" :multi-line="snackbar.mode === 'multi-line'" :timeout="snackbar.timeout" :top="snackbar.position === 'bottom'">
+            <v-layout align-center pr-4>
+                <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+                <v-layout column>
+                <div>
+                    <strong>{{ snackbar.title }}</strong>
+                </div>
+                <div>{{ error_message }}</div>
+                </v-layout>
+            </v-layout>
+            <v-btn v-if="snackbar.timeout === 0" icon @click="snackbar.visible = false">
+                <v-icon>clear</v-icon>
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
+            <div v-for="(errorArray, index) in error_message" :key="index">
+                <div v-for="(error_message, index) in errorArray" :key="index">
+                    {{ error_message }}
+                </div>
+            </div>
         </v-snackbar>
 
     </v-main>
@@ -125,12 +149,25 @@
             return {
                 inputType: 'Tambah',
                 load: false,
-                snackbar: false,
+                snackbar1: false,
+                snackbar: {
+                    color: null,
+                    icon: null,
+                    mode: null,
+                    position: "bottom",
+                    timeout: 2000,
+                    title: null,
+                    visible: false
+                },
                 error_message: '',
                 color: '',
                 search: null,
                 dialog: false,
                 dialogConfirm: false,
+                valid: false,
+                messageRules: [
+                    (v) => !!v || 'This Field is Required !',
+                ],
                 statusPromo: [
                     {text: "Aktif", value: 'Aktif'},
                     {text: "Tidak Aktif", value: 'Tidak Aktif'},
@@ -143,7 +180,6 @@
                     { text: "Status Promo", value: 'status_promo' },
                     { text: "Action", value: 'actions' },
                 ],
-
                 promo: new FormData,
                 promos: [],
                 form: {
@@ -162,6 +198,10 @@
             };
         },
         methods: {
+            clear() {
+                this.$refs.form.reset() // clear form login
+            },
+
             setForm() {
                 if(this.inputType !== 'Tambah'){
                     this.update();
@@ -190,7 +230,6 @@
                 this.promo.append('status_promo', this.form.status_promo);
                 this.promo.append('keterangan', this.form.keterangan);
 
-
                 var url = this.$api + '/promo/'
                 this.load = true;
                 this.$http.post(url, this.promo, {
@@ -199,16 +238,33 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
+                    // this.snackbar = true;
                     this.load = true;
                     this.close();
                     this.readData();
                     this.resetForm();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
+                    // this.snackbar = {
+                    //     color: "error",
+                    //     icon: "mdi-alert-circle",
+                    //     mode: "multi-line",
+                    //     position: "top",
+                    //     timeout: 2000,
+                    //     title: "Error",
+                    //     visible: true
+                    // };
+                    this.snackbar1 = true;
                     this.color = "red";
-                    this.snackbar = true;
                     this.load = false;
                 });
             },
@@ -229,17 +285,34 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = false;
                     this.close();
                     this.readData();
                     this.resetForm();
+                    this.clear();
                     this.inputType = 'Tambah';
                 }).catch(error => {
                     this.error_message = error.response.data.message;
+                    // this.snackbar = {
+                    //     color: "error",
+                    //     icon: "mdi-alert-circle",
+                    //     mode: "multi-line",
+                    //     position: "top",
+                    //     timeout: 2000,
+                    //     title: "Error",
+                    //     visible: true
+                    // };
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
                 });
             },
@@ -254,17 +327,35 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
+                    // this.snackbar = true;
                     this.load = false;
                     this.close();
+                    this.clear();
                     this.readData();
                     this.resetForm();
                     this.inputType = "Tambah";
                 }).catch(error => {
                     this.error_message = error.response.data.message;
-                    this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "error",
+                        icon: "mdi-alert-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Error",
+                        visible: true
+                    };
+                    // this.color = "red";
+                    // this.snackbar1 = true;
                     this.load = false;
                 });
             },
@@ -295,6 +386,7 @@
             cancel() {
                 this.resetForm();
                 this.readData();
+                this.clear();
                 this.dialog = false;
                 this.dialogConfirm = false;
                 this.inputType = 'Tambah';

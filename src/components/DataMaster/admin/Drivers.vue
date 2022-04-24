@@ -137,22 +137,24 @@
                 </v-toolbar>
                 <v-card-text>
                     <v-container>
-                        <v-text-field v-model="form.nama_driver" label="Nama Driver" required></v-text-field>
-                        <v-textarea v-model="form.alamat_driver" label="Alamat Driver" required></v-textarea>
-                        <v-text-field v-model="form.no_telp_driver" label="No. Telp Driver" required></v-text-field>
-                        <v-text-field type="date" v-model="form.tanggal_lahir_driver" label="Tanggal Lahir Driver" required></v-text-field>
-                        <v-text-field v-model="form.email_driver" label="Email Driver" required></v-text-field>
-                        <v-select :items="jenisKelamin" v-model="form.jenis_kelamin" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
-                        <v-text-field v-model="form.tarif_sewa_driver" label="Tarif Driver" required></v-text-field>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Foto Driver" id="file" ref="fileGambar"></v-file-input>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Napza" id="berkasNapza" ref="fileGambar"></v-file-input>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas SIM" id="sim" ref="fileGambar"></v-file-input>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Sehat Jiwa" id="sehatJiwa" ref="fileGambar"></v-file-input>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Sehat Jasmani" id="sehatJasmani" ref="fileGambar"></v-file-input>
-                        <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas SKCK" id="skck" ref="fileGambar"></v-file-input>
-                        <v-select :items="bisaEnglish" v-model="form.isEnglish" label="Bisa Bahasa Inggris?" item-value="value" item-text="text"></v-select>
-                        <v-select :items="statusDriver" v-model="form.status_ketersediaan_driver" label="Status Tersedia Driver" item-value="value" item-text="text"></v-select>
-                        <v-select :items="statusAktifDriver" v-model="form.isAktif" label="Status Driver" item-value="value" item-text="text"></v-select>
+                        <v-form v-model="valid" ref="form">
+                            <v-text-field :rules="messageRules" v-model="form.nama_driver" label="Nama Driver" required></v-text-field>
+                            <v-textarea :rules="messageRules" v-model="form.alamat_driver" label="Alamat Driver" required></v-textarea>
+                            <v-text-field :rules="messageRules" v-model="form.no_telp_driver" label="No. Telp Driver" required></v-text-field>
+                            <v-text-field :rules="messageRules" type="date" v-model="form.tanggal_lahir_driver" label="Tanggal Lahir Driver" required></v-text-field>
+                            <v-text-field :rules="messageRules" v-model="form.email_driver" label="Email Driver" required></v-text-field>
+                            <v-select :rules="messageRules" :items="jenisKelamin" v-model="form.jenis_kelamin" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
+                            <v-text-field :rules="messageRules" v-model="form.tarif_sewa_driver" label="Tarif Driver" required prefix="Rp. "></v-text-field>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Foto Driver" id="file" ref="fileGambar"></v-file-input>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Napza" id="berkasNapza" ref="fileGambar"></v-file-input>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas SIM" id="sim" ref="fileGambar"></v-file-input>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Sehat Jiwa" id="sehatJiwa" ref="fileGambar"></v-file-input>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas Sehat Jasmani" id="sehatJasmani" ref="fileGambar"></v-file-input>
+                            <v-file-input rounded filled prepend-icon="mdi-camera" label="Berkas SKCK" id="skck" ref="fileGambar"></v-file-input>
+                            <v-select :rules="messageRules" :items="bisaEnglish" v-model="form.isEnglish" label="Bisa Bahasa Inggris?" item-value="value" item-text="text"></v-select>
+                            <v-select :rules="messageRules" :items="statusDriver" v-model="form.status_ketersediaan_driver" label="Status Tersedia Driver" item-value="value" item-text="text"></v-select>
+                            <v-select :rules="messageRules" :items="statusAktifDriver" v-model="form.isAktif" label="Status Driver" item-value="value" item-text="text"></v-select>
+                        </v-form>
                     </v-container>
                 </v-card-text>
 
@@ -276,8 +278,27 @@
             <v-img :src="$baseUrl+'/storage/'+this.BANTUSIM" height="400px" width="410px" />
         </v-overlay>  -->
 
-        <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>
-            {{ error_message }}
+        <v-snackbar v-model="snackbar.visible" auto-height :color="snackbar.color" :multi-line="snackbar.mode === 'multi-line'" :timeout="snackbar.timeout" :top="snackbar.position === 'bottom'">
+            <v-layout align-center pr-4>
+                <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+                <v-layout column>
+                <div>
+                    <strong>{{ snackbar.title }}</strong>
+                </div>
+                <div>{{ error_message }}</div>
+                </v-layout>
+            </v-layout>
+            <v-btn v-if="snackbar.timeout === 0" icon @click="snackbar.visible = false">
+                <v-icon>clear</v-icon>
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
+            <div v-for="(errorArray, index) in error_message" :key="index">
+                <div v-for="(error_message, index) in errorArray" :key="index">
+                    {{ error_message }}
+                </div>
+            </div>
         </v-snackbar>
 
         <v-snackbar v-model="snackbarSudahVerifikasi" :color="color" timeout="2000" top>
@@ -293,7 +314,16 @@
             return {
                 inputType: 'Tambah',
                 load: false,
-                snackbar: false,
+                snackbar1: false,
+                snackbar: {
+                    color: null,
+                    icon: null,
+                    mode: null,
+                    position: "bottom",
+                    timeout: 2000,
+                    title: null,
+                    visible: false
+                },
                 error_message: '',
                 color: '',
                 BUATBANTUFOTO: '',
@@ -310,6 +340,10 @@
                 overlay_jiwa: null,
                 overlay_jasmani: null,
                 overlay_skck: null,
+                valid: false,
+                messageRules: [
+                    (v) => !!v || 'This Field is Required !',
+                ],
                 items: [
                 { title: 'Home', icon: 'mdi-view-dashboard' },
                 { title: 'About', icon: 'mdi-forum' },
@@ -324,7 +358,7 @@
                 ],
                 bisaEnglish:[
                     {text: "Bisa", value: 1},
-                    {text: "Tidak Bisa", value: 0},
+                    {text: "Tidak Bisa", value: 2},
                 ],
                 statusDriver:[
                     {text: "Tersedia", value: "Tersedia"},
@@ -332,7 +366,7 @@
                 ],
                 statusAktifDriver: [
                     {text: "Aktif", value: 1},
-                    {text: "Tidak Aktif", value: 0},
+                    {text: "Tidak Aktif", value: 2},
                 ],
                 statusBerkas:[
                     {text: "Verified", value: "Verified"},
@@ -414,6 +448,9 @@
             };
         },
         methods: {
+            clear(){
+                this.$refs.form.reset();
+            },
             setForm() {
                 if(this.inputType !== 'Tambah'){
                     this.update();
@@ -491,19 +528,26 @@
                         'Authorization' : 'Bearer ' + localStorage.getItem('token'),
                     }
                 }).then(response => {
+                    location.reload();
                     this.error_message = response.data.message;
-                    console.log('Masuk sini');
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = true;
                     this.close();
                     this.readData();
                     this.resetForm();
-                    location.reload();
+                    
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
                 });
             },
@@ -554,18 +598,29 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                     this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = false;
                     this.close();
+                    this.clear();
                     this.readData();
                     this.resetForm();
                     this.inputType = 'Tambah';
-                    location.reload();
+                    if(temp_foto.files[0] || temp_napza.files[0] || temp_sim.files[0] || temp_jiwa.files[0]
+                        || temp_jasmani.files[0] || temp_skck.files[0]){
+                        location.reload();
+                    }
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
                 });
             },
@@ -580,8 +635,15 @@
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = false;
                     this.close();
                     this.readData();
@@ -589,8 +651,17 @@
                     this.inputType = "Tambah";
                 }).catch(error => {
                     this.error_message = error.response.data.message;
-                    this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "error",
+                        icon: "mdi-alert-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Error",
+                        visible: true
+                    };
+                    // this.color = "red";
+                    // this.snackbar = true;
                     this.load = false;
                 });
             },
@@ -642,8 +713,15 @@
                         }
                     }).then(response => {
                         this.error_message = response.data.message;
-                        this.color = "green";
-                        this.snackbar = true;
+                        this.snackbar = {
+                            color: "success",
+                            icon: "mdi-check-circle",
+                            mode: "multi-line",
+                            position: "top",
+                            timeout: 2000,
+                            title: "Success",
+                            visible: true
+                        };
                         this.load = false;
                         this.close();
                         this.readData();
@@ -656,9 +734,18 @@
                     });
                 }
                 else{
-                    this.color = "primary";
+                    this.snackbar = {
+                        color: "info",
+                        icon: "mdi-information-outline",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Information",
+                        visible: true
+                    };
+                    this.error_message = 'Anda Sudah Verifikasi Driver ini';
                     this.dialogVerifikasi = false;
-                    this.snackbarSudahVerifikasi = true;
+                    // this.snackbarSudahVerifikasi = true;
                 }
             },
 
@@ -685,18 +772,27 @@
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
-                location.reload();
                 this.readData();
             },
 
             cancel() {
                 this.resetForm();
                 this.readData();
+                this.clear();
                 this.dialog = false;
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
                 // this.inputType = 'Tambah';
-                location.reload();
+                var temp_napza = document.getElementById("berkasNapza");
+                var temp_sim = document.getElementById("sim");
+                var temp_jiwa = document.getElementById("sehatJiwa");
+                var temp_jasmani = document.getElementById("sehatJasmani");
+                var temp_skck = document.getElementById("skck");
+                var temp_foto = document.getElementById("file");
+                if(temp_foto.files[0] || temp_napza.files[0] || temp_sim.files[0] || temp_jiwa.files[0]
+                    || temp_jasmani.files[0] || temp_skck.files[0]){
+                    location.reload();
+                }
             },
 
             resetForm(){
