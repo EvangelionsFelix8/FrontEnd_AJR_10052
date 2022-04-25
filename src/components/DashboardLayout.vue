@@ -71,16 +71,16 @@ export default {
             ],
         };
     },
-    // methods: {
-    //     logout(){
-    //         localStorage.removeItem('id');
-    //         localStorage.removeItem('token');
-    //         location.reload();
-    //         this.$router.push({
-    //             name: 'Login',
-    //         });
-    //     }
-    // }
+    methods: {
+        logout(){
+            // localStorage.removeItem('id');
+            // localStorage.removeItem('token');
+            // location.reload();
+            this.$router.push({
+                name: 'landingPage',
+            });
+        }
+    }
 };
 </script>
 

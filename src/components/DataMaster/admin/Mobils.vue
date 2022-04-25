@@ -463,16 +463,16 @@
                 if(this.form.mulai_kontrak !== null){
                     this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
                 }
-                else{
-                    this.mobil.append('mulai_kontrak', null);
-                }
+                // else{
+                //     this.mobil.append('mulai_kontrak', null);
+                // }
                 // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
                 if(this.form.selesai_kontrak !== null){
                    this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
                 }
-                else{
-                    this.mobil.append('selesai_kontrak', null);
-                }
+                // else{
+                //     this.mobil.append('selesai_kontrak', null);
+                // }
                 // this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
                 this.mobil.append('tanggal_servis_terakhir', this.form.tanggal_servis_terakhir);
 

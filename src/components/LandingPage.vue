@@ -144,30 +144,31 @@
             </v-hover>
         </v-dialog> 
 
-        <v-dialog v-model="dialogLogin" persistent max-width="600px">
+        <v-dialog v-model="dialogLogin" persistent max-width="500px">
             <v-hover v-slot="{ hover }">
                 <v-card :elevation="hover ? 12 : 2" :class="{ 'on-hover': hover }">
                     <v-toolbar color="#00396c">
                         <v-card-title >
-                            <div style="width: 535px; text-align: center;" class="h6, white--text">
+                            <div style="width: 435px; text-align: center;" class="h6, white--text">
                                 LOGIN
                             </div>
                         </v-card-title>
                     </v-toolbar>
                     <v-card-text>
-                        <v-container>
+                        <v-container style="margin-top: 25px;">
                             <v-form v-model="valid" ref="form">
-                                <v-text-field label="Email" :rules="emailRules" required ></v-text-field>
-                                <v-text-field label="Password" :rules="passwordRules" required></v-text-field>
+                                <strong>Email Address</strong>
+                                <v-text-field outlined :rules="emailRules" required ></v-text-field>
+                                <strong>Password</strong>
+                                <v-text-field outlined @click:append="show1 = !show1" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'" :rules="passwordRules" required></v-text-field>
                             </v-form>
                         </v-container>
                     </v-card-text>
-
                     <v-card-actions>
                         <v-btn color="blue darken-1" text @click="clear"> Clear Form </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelLogin"> Cancel </v-btn>
-                        <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" text @click="setForm"> Login </v-btn>
+                        <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" @click="setForm"> <span style="color: white;"> Login </span></v-btn>
                     </v-card-actions>
                 </v-card>
             </v-hover>
@@ -190,6 +191,7 @@ export default {
             dialogLogin: false,
             dialogRegister: false,
             valid: false,
+            show1: false,
             logo: require('@/assets/logo_ajr.png'),
             logo_con1: require('@/assets/5230.jpg'),
             logo_join: require('@/assets/imgbin_car-rental-taxi-enterprise-rent-a-car-renting-png.png'),
@@ -233,6 +235,7 @@ export default {
         },
 
         clear() {
+            this.$refs.form.reset();
             this.resetForm();
             this.load = true;
             // location.reload();
@@ -241,6 +244,7 @@ export default {
 
         cancelLogin() {
             this.clear();
+            this.resetForm();
             this.dialogLogin = false;
             
         },

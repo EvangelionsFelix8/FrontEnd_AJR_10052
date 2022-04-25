@@ -60,7 +60,7 @@ export default {
                 // { icon: 'mdi-account-tie', title: 'Role', to: '/role'},
                 { icon: 'mdi-sack-percent', title: 'Promo', to: '/promo'},
                 { icon: 'mdi-calendar-blank', title: 'Jadwal', to: '/jadwal'},
-                { icon: 'mdi-calendar-multiple', title: 'Detail Jadwal', to: '/detailjadwal'},
+                { icon: 'mdi-calendar-multiple', title: 'Penjadwalan', to: '/detailjadwal'},
                 // { icon: 'mdi-account-hard-hat', title: 'Pegawai', to: '/pegawai'},
                 // { icon: 'mdi-account', title: 'Driver', to: '/driver'},
                 // { icon: 'mdi-account-group', title: 'Mitra', to: '/mitra'},
@@ -71,16 +71,16 @@ export default {
             ],
         };
     },
-    // methods: {
-    //     logout(){
-    //         localStorage.removeItem('id');
-    //         localStorage.removeItem('token');
-    //         location.reload();
-    //         this.$router.push({
-    //             name: 'Login',
-    //         });
-    //     }
-    // }
+    methods: {
+        logout(){
+            // localStorage.removeItem('id');
+            // localStorage.removeItem('token');
+            // location.reload();
+            this.$router.push({
+                name: 'LandingPage',
+            });
+        }
+    }
 };
 </script>
 

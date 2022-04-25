@@ -17,61 +17,279 @@
                 <v-btn color="success" dark @click="dialog = true"> Tambah Penjadwalan </v-btn>
             </v-card-title>
         </v-card>
-
-        <!-- <v-chip-group active-class="white--text">
-            <v-chip
-                filter
-                color="white"
-                style="margin-top: 20px"
-                text-color="primary"
-                @click="readData"
-            > All </v-chip>
-
-            <v-chip
-                filter
-                color="white"
-                style="margin-top: 20px; margin-left: 10px"
-                text-color="primary"
-                @click='isAktifOn'
-            > Active only</v-chip>
-        </v-chip-group> -->
         
-        <v-card style='margin-top: 20px'>
-            <v-data-table :headers="headers" :items="detailjadwals" :search="search">
-                <!-- <template v-slot:[`item.shift`]="{item}">
-                    <span v-if="item.shift == 1">{{ item.shift }} (08.00-15.00)</span>
-                    <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Aktif</strong></v-chip> </span>
-                </template> -->
-                <template v-slot:[`item.hari_kerja`]="{item}">
-                    <span v-if="item.shift == 1">{{item.hari_kerja}}  -  {{ item.shift }}</span>
-                    <span v-else>{{item.hari_kerja}} -  {{ item.shift }} </span>
-                </template>
-                <template v-slot:[`item.jam_kerja`]="{item}">
-                    <span v-if="item.shift == 1"><v-chip label color="yellow lighten-4" text-color="yellow darken-4"> <strong> 08.00 - 15.00 </strong> </v-chip></span>
-                    <span v-else><v-chip label color="deep-orange lighten-4" text-color="deep-orange darken-4"><strong> 15.00 - 22.00 </strong></v-chip></span>
-                </template>
-                <template v-slot:[`item.actions`]= "{ item }">
-                    <v-menu>
-                        <template v-slot:activator="{ on: menu, attrs }">
-                            <v-tooltip bottom>
-                            <template v-slot:activator="{ on: tooltip }">
-                                <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
-                                <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
-                            </template>
-                            <span>Click me!</span>
-                            </v-tooltip>
-                        </template>
-                        
-                        <v-list>
-                            <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
-                            <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
-                        </v-list>
-                    </v-menu>
-                   
-                </template>
+        <div class="text-center d-flex pb-4">
+            <v-chip-group active-class="white--text">
+                <v-chip
+                    filter
+                    color="white"
+                    style="margin-top: 20px"
+                    text-color="primary"
+                    @click="all"
+                > Open All Jadwal </v-chip>
 
-            </v-data-table>
-        </v-card>
+                <v-chip
+                    filter
+                    color="white"
+                    style="margin-top: 20px; margin-left: 10px"
+                    text-color="primary"
+                    @click='none'
+                > Close All Jadwal</v-chip>
+            </v-chip-group>
+        </div>
+
+        <v-row>
+        <!-- HARI SELASA -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c">
+                        <strong class="white--text">Selasa</strong>
+                        <template v-slot:actions>
+                            <v-icon color="white">
+                                $expand
+                            </v-icon>
+                        </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_selasa" :search="search">             
+                            <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span>{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                                <!-- <span v-else>{{item.hari_kerja}} -  {{ item.shift }} </span> -->
+                            </template>
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            </template>
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        <!-- HARI RABU -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel1" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c"><strong class="white--text">Rabu</strong>
+                        <template v-slot:actions>
+                            <v-icon color="white">
+                                $expand
+                            </v-icon>
+                        </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_rabu" :search="search">             
+                            <!-- <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span>{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                            </template> -->
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            </template>
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        <!-- HARI KAMIS  -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel2" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c"><strong class="white--text">Kamis</strong>
+                    <template v-slot:actions>
+                        <v-icon color="white">
+                            $expand
+                        </v-icon>
+                    </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_kamis" :search="search">             
+                            <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span>{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                            </template>
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            </template>
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        <!-- HARI JUMAT -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel3" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c"><strong class="white--text">Jumat</strong>
+                    <template v-slot:actions>
+                        <v-icon color="white">
+                            $expand
+                        </v-icon>
+                    </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_jumat" :search="search">             
+                            <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span>{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                            </template>
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            
+                            </template>
+
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                
+                </v-expansion-panel>
+                
+                </v-expansion-panels>
+            </v-col>
+        <!-- HARI SABTU -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel4" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c"><strong class="white--text">Sabtu</strong>
+                    <template v-slot:actions>
+                        <v-icon color="white">
+                            $expand
+                        </v-icon>
+                    </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_sabtu" :search="search">             
+                            <!-- <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span v-if="item.hari_kerja == 'Selasa'">{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                                <span v-else>{{item.hari_kerja}} -  {{ item.shift }} </span>
+                            </template> -->
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            
+                            </template>
+
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                
+                </v-expansion-panel>
+                
+                </v-expansion-panels>
+            </v-col>
+        <!-- HARI MINGGU -->
+            <v-col cols="6">
+                <v-expansion-panels v-model="panel6" multiple>
+                <v-expansion-panel>
+                    <v-expansion-panel-header color="#00396c"><strong class="white--text">Minggu</strong>
+                    <template v-slot:actions>
+                        <v-icon color="white">
+                            $expand
+                        </v-icon>
+                    </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <v-data-table :headers="headers" :items="detailjadwals_minggu" :search="search">             
+                            <!-- <template v-slot:[`item.hari_kerja`]="{item}">
+                                <span v-if="item.hari_kerja == 'Selasa'">{{item.nama_pegawai}} - {{ item.nama_role }} </span>
+                                <span v-else>{{item.hari_kerja}} -  {{ item.shift }} </span>
+                            </template> -->
+                            <template v-slot:[`item.actions`]= "{ item }">
+                                <v-menu>
+                                    <template v-slot:activator="{ on: menu, attrs }">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
+                                        </template>
+                                        <span>Click me!</span>
+                                        </v-tooltip>
+                                    </template>
+                                    
+                                    <v-list>
+                                        <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
+                                        <v-list-item-title><v-btn class="red--text" style="min-width: 100px;" small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn></v-list-item-title>
+                                    </v-list>
+                                </v-menu>
+                            
+                            </template>
+
+                        </v-data-table>
+                    </v-expansion-panel-content>
+                
+                </v-expansion-panel>
+                
+                </v-expansion-panels>
+            </v-col>
+        </v-row>
 
         <!-- <v-btn small class="mr-2" @click="editHandler(item)"> Edit </v-btn>
         <v-btn small @click="deleteHandler(item.id_detail_jadwal)"> Delete </v-btn> -->
@@ -88,8 +306,6 @@
                         <v-form v-model="valid" ref="form">
                             <v-select :rules="messageRules" :items="pegawais" v-model="form.id_pegawai" label="Nama Pegawai" item-value="id_pegawai" :item-text="item => item.nama_pegawai +' - '+ item.nama_role"></v-select>
                             <v-select :rules="messageRules" :items="jadwals" v-model="form.id_jadwal" label="Hari Kerja" item-value="id_jadwal" :item-text="item => item.hari_kerja +' - '+ item.shift" ></v-select>
-                            <!-- <v-text-field v-model="form.nama_role" label="Jabatan" item-value="id_role" item-text="nama_pegawai" required></v-text-field>
-                            <v-text-field v-model="form.shift" label="Shift" required></v-text-field> -->
                         </v-form>
                     </v-container>
                 </v-card-text>
@@ -151,6 +367,14 @@
         name: "List",
         data(){
             return {
+                panel: [],
+                panel1: [],
+                panel2: [],
+                panel3: [],
+                panel4: [],
+                panel5: [],
+                panel6: [],
+                items: 7,
                 inputType: 'Tambah',
                 load: false,
                 snackbar1: false,
@@ -175,16 +399,25 @@
                 headers: [
                     { text: "Nama Pegawai", value: 'nama_pegawai' },
                     { text: "Jabatan", value: 'nama_role' },
-                    { text: "Hari Kerja dan Shift", value: 'hari_kerja' },
-                    { text: "Jam Kerja", value: 'jam_kerja' },
+                    { text: "Shift", value: 'shift' },
                     { text: "Action", value: 'actions' },
                 ],
-                detailjadwal: new FormData,
-                detailjadwals: [
-                    {
-                        
-                    }
+                haris: [
+                    {"text": "Selasa"},
+                    {"text": "Rabu"},
+                    {"text": "Kamis"},
+                    {"text": "Jumat"},
+                    {"text": "Sabtu"},
+                    {"text": "Minggu"},
                 ],
+                detailjadwal: new FormData,
+                detailjadwals: [],
+                detailjadwals_selasa: [],
+                detailjadwals_rabu: [],
+                detailjadwals_kamis: [],
+                detailjadwals_jumat: [],
+                detailjadwals_sabtu: [],
+                detailjadwals_minggu: [],
                 jadwals:[],
                 pegawais:[],
                 form: {
@@ -196,6 +429,26 @@
             };
         },
         methods: {
+            all () {
+                this.panel = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel1 = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel2 = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel3 = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel4 = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel5 = [...Array(this.items).keys()].map((k, i) => i)
+                this.panel6 = [...Array(this.items).keys()].map((k, i) => i)
+            },
+            // Reset the panel
+            none () {
+                this.panel = []
+                this.panel1 = []
+                this.panel2 = []
+                this.panel3 = []
+                this.panel4 = []
+                this.panel5 = []
+                this.panel6 = []
+            },
+
             clear() {
                 this.$refs.form.reset() // clear form login
             },
@@ -211,6 +464,7 @@
             },
             // Read Data detailjadwals
             readData() {
+                // console.log(detailjadwals['hari_kerja']);
                 var url = this.$api + '/detailjadwal';
                 this.$http.get(url, {
                     headers: {
@@ -218,6 +472,78 @@
                     }
                 }).then(response => {
                     this.detailjadwals = response.data.data;
+                })
+            },
+
+            readDataSelasa() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_selasa';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_selasa = response.data.data;
+                })
+            },
+
+            readDataRabu() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_rabu';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_rabu = response.data.data;
+                })
+            },
+
+            readDataKamis() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_kamis';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_kamis = response.data.data;
+                })
+            },
+
+            readDataJumat() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_jumat';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_jumat = response.data.data;
+                })
+            },
+
+            readDataSabtu() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_sabtu';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_sabtu = response.data.data;
+                })
+            },
+
+            readDataMinggu() {
+                // console.log(detailjadwals['hari_kerja']);
+                var url = this.$api + '/detailjadwal_minggu';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.detailjadwals_minggu = response.data.data;
                 })
             },
 
@@ -272,6 +598,12 @@
                     this.clear();
                     this.close();
                     this.readData();
+                    this.readDataSelasa();
+                    this.readDataRabu();
+                    this.readDataKamis();
+                    this.readDataJumat();
+                    this.readDataSabtu();
+                    this.readDataMinggu();
                     this.resetForm();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
@@ -319,6 +651,12 @@
                     this.load = false;
                     this.close();
                     this.readData();
+                    this.readDataSelasa();
+                    this.readDataRabu();
+                    this.readDataKamis();
+                    this.readDataJumat();
+                    this.readDataSabtu();
+                    this.readDataMinggu();
                     this.resetForm();
                     this.clear();
                     this.inputType = 'Tambah';
@@ -366,6 +704,12 @@
                     this.close();
                     this.clear();
                     this.readData();
+                    this.readDataSelasa();
+                    this.readDataRabu();
+                    this.readDataKamis();
+                    this.readDataJumat();
+                    this.readDataSabtu();
+                    this.readDataMinggu();
                     this.resetForm();
                     this.inputType = "Tambah";
                 }).catch(error => {
@@ -401,11 +745,23 @@
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
                 this.readData();
+                this.readDataSelasa();
+                this.readDataRabu();
+                this.readDataKamis();
+                this.readDataJumat();
+                this.readDataSabtu();
+                this.readDataMinggu();
             },
 
             cancel() {
                 this.resetForm();
                 this.readData();
+                this.readDataSelasa();
+                this.readDataRabu();
+                this.readDataKamis();
+                this.readDataJumat();
+                this.readDataSabtu();
+                this.readDataMinggu();
                 this.clear();
                 this.dialog = false;
                 this.dialogConfirm = false;
@@ -430,6 +786,12 @@
             this.readDataPegawai();
             this.readDataJadwal();
             this.readData();
+            this.readDataSelasa();
+            this.readDataRabu();
+            this.readDataKamis();
+            this.readDataJumat();
+            this.readDataSabtu();
+            this.readDataMinggu();
         },
     };
 </script>
