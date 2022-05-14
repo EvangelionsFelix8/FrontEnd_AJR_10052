@@ -58,10 +58,16 @@
                 </template>
                 <template v-slot:[`item.tarif_sewa_driver`]="{item}">
                     <span>
-                        Rp. {{ item.tarif_sewa_driver }}</span>
+                        Rp. {{ item.tarif_sewa_driver.toString().replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1\.") }}</span>
                 </template>
                 <template v-slot:[`item.rerata_rating_driver`]="{item}">
-                    <span>{{ item.rerata_rating_driver }} <v-icon color="yellow darken-2"> mdi-star </v-icon></span>
+                    <span v-for="rerata in rata2s" :key="rerata.id_driver">
+                        <span v-if="item.id_driver == rerata.id_driver">
+                            <span v-if="rerata.rata_rating != null">{{ rerata.rata_rating }} </span>
+                            <span v-else>0</span>
+                            <v-icon color="yellow darken-2"> mdi-star </v-icon>
+                        </span>
+                    </span>
                 </template>
                 <!-- <template v-slot:[`item.berkas_bebas_napza`]="{item}">
                     <v-img :src="$baseUrl+'/storage/'+item.berkas_bebas_napza" height="100px" width="200px" style="object-fit:cover"/> 
@@ -313,6 +319,7 @@
         data(){
             return {
                 inputType: 'Tambah',
+                rata2s: [],
                 load: false,
                 snackbar1: false,
                 snackbar: {
@@ -380,13 +387,13 @@
                     // { text: "Tanggal Lahir", value: 'tanggal_lahir_driver' },
                     // { text: "Jenis Kelamin", value: 'jenis_kelamin' },
                     { text: "No. Telp Driver", value: 'no_telp_driver' },
-                    { text: "Tarif Sewa", value: 'tarif_sewa_driver', width: '125px' },
+                    { text: "Tarif Sewa", value: 'tarif_sewa_driver', width: '120px' },
                     // { text: "Berkas Bebas Napza", value: 'berkas_bebas_napza' },
                     // { text: "Berkas SIM", value: 'berkas_sim' },
                     // { text: "Berkas Sehat Jiwa", value: 'berkas_sehat_jiwa' },
                     // { text: "Berkas Sehat Jasmani", value: 'berkas_sehat_jasmani' },
                     // { text: "Berkas SKCK", value: 'berkas_skck' },
-                    { text: "Rerata Driver", value: 'rerata_rating_driver', width: '80px' },
+                    { text: "Rerata Driver", value: 'rerata_rating_driver', width: '90px' },
                     { text: "Status Ketersediaan", value: 'status_ketersediaan_driver' },
                     { text: "Status Berkas", value: 'status_berkas' },
                     { text: "Bahasa Inggris", value: 'isEnglish' },
@@ -469,6 +476,18 @@
                     }
                 }).then(response => {
                     this.drivers = response.data.data;
+                })
+            },
+
+            readDataRerataDriver() {
+                // ini di TransaksiController
+                var url = this.$api + '/getreratadriverfortable';
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.rata2s = response.data.data;
                 })
             },
 
@@ -852,6 +871,7 @@
 
         mounted() {
             this.readData();
+            this.readDataRerataDriver();
             // this.isAktifOn();
         },
     };

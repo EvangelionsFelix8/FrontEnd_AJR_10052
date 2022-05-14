@@ -63,7 +63,7 @@
                 </template>
                 <template v-slot:[`item.harga_sewa_mobil`]="{item}">
                     <span>
-                        Rp. {{ item.harga_sewa_mobil }}</span>
+                        Rp. {{ item.harga_sewa_mobil.toString().replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1\.") }}</span>
                 </template>
                 <template v-slot:[`item.kategori_aset`]="{item}">
                     <span v-if="item.id_mitra == null"><v-chip label color="blue lighten-4" text-color="blue darken-4"><strong>Perusahaan</strong></v-chip></span>

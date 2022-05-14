@@ -122,13 +122,13 @@
                     <v-card-text>
                         <v-container>
                             <v-form v-model="valid" ref="form">
-                                <v-text-field v-model="form.nama_customer" label="Nama Customer" required></v-text-field>
-                                <v-textarea v-model="form.alamat_customer" label="Alamat Customer" required></v-textarea>
-                                <v-select :items="jenisKelamins" v-model="form.jenis_kelamin" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
-                                <v-text-field v-model="form.email_customer" label="Email Customer" required></v-text-field>
-                                <v-text-field type="date" v-model="form.tanggal_lahir_customer" label="Tanggal Lahir" required></v-text-field>
-                                <v-text-field v-model="form.no_telp_customer" label="No. Telp Customer" required></v-text-field>
-                                <v-file-input type="file" rounded filled prepend-icon="mdi-camera" label="Tanda Pengenal" id="foto_no_tanda_pengenal" ref="fileGambar"></v-file-input>
+                                <v-text-field :rules="messageRules" v-model="form.nama_customer" label="Nama" required></v-text-field>
+                                <v-textarea :rules="messageRules" v-model="form.alamat_customer" label="Alamat" required></v-textarea>
+                                <v-select :rules="messageRules" :items="jenisKelamins" v-model="form.jenis_kelamin" label="Jenis Kelamin" item-value="value" item-text="text"></v-select>
+                                <v-text-field :rules="messageRules" v-model="form.email_customer" label="Email" required></v-text-field>
+                                <v-text-field :rules="messageRules" type="date" v-model="form.tanggal_lahir_customer" label="Tanggal Lahir" required></v-text-field>
+                                <v-text-field :rules="messageRules" v-model="form.no_telp_customer" label="No. Telp" required></v-text-field>
+                                <v-file-input :rules="messageRules" type="file" rounded filled prepend-icon="mdi-camera" label="Tanda Pengenal" id="foto_no_tanda_pengenal" ref="fileGambar"></v-file-input>
                                 <v-file-input rounded filled prepend-icon="mdi-camera" label="Surat Izin Mengemudi" id="foto_sim" ref="fileSim"></v-file-input>
                             </v-form>
                         </v-container>
@@ -138,7 +138,7 @@
                         <span>Sudah punya akun?</span><v-btn color="blue darken-1" text @click="changedialog"> Login </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelRegis"> Cancel </v-btn>
-                        <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+                        <v-btn color="blue darken-1" text @click="save"> Register </v-btn>
                     </v-card-actions>
                 </v-card>
             </v-hover>
@@ -165,7 +165,7 @@
                         </v-container>
                     </v-card-text>
                     <v-card-actions>
-                        <v-btn color="blue darken-1" text @click="clear"> Clear Form </v-btn>
+                        <span>Belom punya akun?</span><v-btn color="blue darken-1" text @click="changedialog1"> Register </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelLogin"> Cancel </v-btn>
                         <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" @click="setForm"> <span style="color: white;"> Login </span></v-btn>
@@ -174,7 +174,29 @@
             </v-hover>
         </v-dialog>
 
-        <v-snackbar v-model="snackbar" :color="color" timeout="2000" bottom>{{ error_message }}</v-snackbar>
+        <v-snackbar v-model="snackbar.visible" auto-height :color="snackbar.color" :multi-line="snackbar.mode === 'multi-line'" :timeout="snackbar.timeout" :top="snackbar.position === 'bottom'">
+            <v-layout align-center pr-4>
+                <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+                <v-layout column>
+                <div>
+                    <strong>{{ snackbar.title }}</strong>
+                </div>
+                <div>{{ error_message }}</div>
+                </v-layout>
+            </v-layout>
+            <v-btn v-if="snackbar.timeout === 0" icon @click="snackbar.visible = false">
+                <v-icon>clear</v-icon>
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
+            <div v-for="(errorArray, index) in error_message" :key="index">
+                <div v-for="(error_message, index) in errorArray" :key="index">
+                    {{ error_message }}
+                </div>
+            </div>
+        </v-snackbar>
+
     </v-main>
 </template>
 
@@ -184,7 +206,16 @@ export default {
     data(){
         return{
             load: false,
-            snackbar: false,
+            snackbar1: false,
+            snackbar: {
+                color: null,
+                icon: null,
+                mode: null,
+                position: "bottom",
+                timeout: 2000,
+                title: null,
+                visible: false
+            },
             color: '',
             error_message: '',
             customer: new FormData,
@@ -196,8 +227,11 @@ export default {
             logo_con1: require('@/assets/5230.jpg'),
             logo_join: require('@/assets/imgbin_car-rental-taxi-enterprise-rent-a-car-renting-png.png'),
             jenisKelamins: [
-                {text: "Laki-Laki", value: "Laki-Laki"},
+                {text: "Laki-laki", value: "Laki-laki"},
                 {text: "Perempuan", value: "Perempuan"},
+            ],
+            messageRules: [
+                (v) => !!v || 'This Field is Required !',
             ],
             passwordRules: [
                 (v) => !!v || 'Password tidak boleh kosong',
@@ -221,6 +255,10 @@ export default {
         };
     },
     methods: {
+        // clear(){
+        //     this.$refs.form.reset();
+        // },
+
         scrollMeTo(refName) {
             var element = this.$refs[refName];
             var top = element.offsetTop;
@@ -236,15 +274,16 @@ export default {
 
         clear() {
             this.$refs.form.reset();
-            this.resetForm();
-            this.load = true;
+            // this.$refs.form1.reset();
+            // this.resetForm();
+            // this.load = true;
             // location.reload();
             // this.$refs.form.resetForm(); // clear form login
         },
 
         cancelLogin() {
             this.clear();
-            this.resetForm();
+            // this.resetForm();
             this.dialogLogin = false;
             
         },
@@ -258,8 +297,15 @@ export default {
         },
 
         changedialog (){
+            this.clear();
             this.dialogRegister = false;
             this.dialogLogin = true;
+        },
+
+        changedialog1 (){
+            this.clear();
+            this.dialogRegister = true;
+            this.dialogLogin = false;
         },
 
         save(){
@@ -287,16 +333,24 @@ export default {
                     }
                 }).then(response => {
                     this.error_message = response.data.message;
-                    this.color = "green";
-                    this.snackbar = true;
+                    this.snackbar = {
+                        color: "success",
+                        icon: "mdi-check-circle",
+                        mode: "multi-line",
+                        position: "top",
+                        timeout: 2000,
+                        title: "Success",
+                        visible: true
+                    };
                     this.load = true;
                     this.close();
                     this.readData();
                     this.clear();
+                    location.reload();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
-                    this.snackbar = true;
+                    this.snackbar1 = true;
                     this.load = false;
                 });
             // }
@@ -320,10 +374,7 @@ export default {
                 status_berkas: null,
                 no_tanda_pengenal: null,
                 no_sim: null,
-                
-            },
-            this.$refs.fileGambar = null;
-            this.$refs.fileSim = '';
+            }
         },
     },
 }

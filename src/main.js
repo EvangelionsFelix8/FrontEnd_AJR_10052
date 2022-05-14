@@ -13,7 +13,7 @@ Vue.prototype.$api = 'http://127.0.0.1:8000/api'; // link backend
 Vue.prototype.$baseUrl = 'http://127.0.0.1:8000';
 
 new Vue({
-  vuetify,
   router,
+  vuetify,
   render: h => h(App),
 }).$mount('#app');
