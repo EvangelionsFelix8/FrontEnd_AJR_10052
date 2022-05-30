@@ -141,6 +141,7 @@ export default {
             show: false,
             count: 0,
             countDone: 0,
+            countBatal: 0,
             snackbar: {
                 color: null,
                 icon: null,
@@ -184,7 +185,7 @@ export default {
         },
 
         newTransaksi(){
-            if((this.count - this.countDone) >= 1){
+            if((this.count - this.countDone - this.countBatal) >= 1){
                 this.snackbar = {
                     color: "info",
                     icon: "mdi-information-outline",
@@ -194,6 +195,10 @@ export default {
                     title: "Information",
                     visible: true
                 };
+                console.log(this.count, 'inicount');
+                console.log(this.countDone, 'countDone');
+                console.log(this.countBatal, 'inibatal');
+                console.log(this.count - this.countDone - this.countBatal);
                 this.error_message = 'Hanya Boleh 1x Transaksi saja';
             }
             else{
@@ -205,7 +210,7 @@ export default {
 
         readDataBanyakTransaksi() {
             this.temp_banyak = true;
-            var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+            var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
             this.$http.get(url, {
                 headers: {
                     'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -217,7 +222,7 @@ export default {
 
         readDataTransaksiDone() {
             this.temp_banyak = true;
-            var url = this.$api + '/countTransactionDone/' + 'CUS220506-010';
+            var url = this.$api + '/countTransactionDone/' + sessionStorage.getItem('id_customer');
             this.$http.get(url, {
                 headers: {
                     'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -227,10 +232,23 @@ export default {
             })
         },
 
+        readDataTransaksiBatal() {
+            this.temp_banyak = true;
+            var url = this.$api + '/countTransactionBatal/' + sessionStorage.getItem('id_customer');
+            this.$http.get(url, {
+                headers: {
+                    'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                }
+            }).then(response => {
+                this.countBatal = response.data.data;
+            })
+        },
+
         logout(){
-            // localStorage.removeItem('id');
-            // localStorage.removeItem('token');
-            // location.reload();
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("id_customer");
+            sessionStorage.removeItem("nama_customer");
+            sessionStorage.removeItem("email");
             this.$router.push({
                 name: 'LandingPage',
             });
@@ -240,6 +258,7 @@ export default {
     mounted(){
         this.readDataBanyakTransaksi();
         this.readDataTransaksiDone();
+        this.readDataTransaksiBatal();
     },
 };
 </script>

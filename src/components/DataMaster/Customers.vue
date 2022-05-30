@@ -291,7 +291,7 @@
                         this.error_message = 'Sudah Verifikasi Tanda Pengenal, tapi SIM belum';
                     }
                     else{
-                        this.error_message = 'Anda Sudah Verifikasi Driver ini';
+                        this.error_message = 'Anda Sudah Verifikasi Customer ini';
                     }
                     this.dialogVerifikasi = false;
                 }

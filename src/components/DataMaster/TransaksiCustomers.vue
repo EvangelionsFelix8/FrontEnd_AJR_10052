@@ -40,6 +40,7 @@
                     <span v-if="item.status_transaksi == 'Menunggu Verifikasi'"><v-chip label color="indigo lighten-4" text-color="indigo darken-4"><strong>Menunggu Verifikasi</strong></v-chip></span>
                     <span v-else-if="item.status_transaksi == 'On Progress'"><v-chip label color="orange lighten-4" text-color="orange darken-4"><strong>On Progress</strong></v-chip></span>
                     <span v-else-if="item.status_transaksi == 'Sudah Bayar, Menunggu Verifikasi'"><v-chip label color="blue lighten-4" text-color="blue darken-4"><strong>Sudah Bayar, Menunggu Verifikasi</strong></v-chip></span>
+                    <span v-else-if="item.status_transaksi == 'Batal'"><v-chip label color="pink lighten-4" text-color="pink darken-4"><strong>Batal</strong></v-chip></span>
                     <span v-else><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Sudah lunas (Selesai)</strong></v-chip> </span>
                 </template>
                 <template v-slot:[`item.actions`]= "{ item }">
@@ -595,6 +596,7 @@ import jspdf from 'jspdf'
             return {
                 count: 0,
                 countDone: 0,
+                countBata: 0,
                 dialogDetail: false,
                 metodeBayar: '',
                 dialogBayar: false,
@@ -692,7 +694,7 @@ import jspdf from 'jspdf'
         methods: {
 
             newTransaksi(){
-                if((this.count - this.countDone) >= 1){
+                if((this.count - this.countDone - this.countBatal) >= 1){
                     this.snackbar = {
                         color: "info",
                         icon: "mdi-information-outline",
@@ -734,7 +736,7 @@ import jspdf from 'jspdf'
             },
             // Read Data Customers
             readData() {
-                var url = this.$api + '/showbycustomer/' + 'CUS220506-010';
+                var url = this.$api + '/showbycustomer/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -746,7 +748,7 @@ import jspdf from 'jspdf'
 
             // readDataTransaksi() {
             //     this.temp_banyak = true;
-            //     var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+            //     var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
             //     console.log(url)
             //     this.$http.get(url, {
             //         headers: {
@@ -759,7 +761,7 @@ import jspdf from 'jspdf'
 
             readDataBanyakTransaksi() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+                var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -771,13 +773,25 @@ import jspdf from 'jspdf'
 
             readDataTransaksiDone() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransactionDone/' + 'CUS220506-010';
+                var url = this.$api + '/countTransactionDone/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
                     }
                 }).then(response => {
                     this.countDone = response.data.data;
+                })
+            },
+
+            readDataTransaksiBatal() {
+                this.temp_banyak = true;
+                var url = this.$api + '/countTransactionBatal/' + sessionStorage.getItem('id_customer');
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.countBatal = response.data.data;
                 })
             },
 
@@ -799,6 +813,9 @@ import jspdf from 'jspdf'
                     this.error_message = 'Transaksi Sedang Berjalan, Tidak bisa diedit';
                     if(item.status_transaksi == 'Sudah lunas (Selesai)'){
                         this.error_message = 'Transaksi Sudah Selesai, Tidak bisa diedit';
+                    }
+                    else if(item.status_transaksi == 'Batal'){
+                        this.error_message = 'Transaksi Sudah Dibatalkan, Tidak bisa diedit';
                     }
                 }
                 else{
@@ -1013,6 +1030,9 @@ import jspdf from 'jspdf'
                         visible: true
                     };
                     this.error_message = 'Transaksi Anda Sedang Berjalan';
+                    if(item.status_transaksi == 'Batal'){
+                        this.error_message = 'Transaksi sudah Dibatalkan';
+                    }
                 }
             },
 
@@ -1148,7 +1168,9 @@ import jspdf from 'jspdf'
             },
 
             kembaliMobil(item){
-                if(item.status_transaksi != 'Menunggu Verifikasi' && item.status_transaksi != 'Sudah Bayar, Menunggu Verifikasi' && item.status_transaksi != 'Sudah lunas (Selesai)'){
+                if(item.status_transaksi != 'Menunggu Verifikasi' && 
+                item.status_transaksi != 'Sudah Bayar, Menunggu Verifikasi' && 
+                item.status_transaksi != 'Sudah lunas (Selesai)' && item.status_transaksi != 'Batal'){
                     this.data.id_transaksi = item.id_transaksi;
                     this.data.id_promo = item.id_promo;
                     this.data.id_driver = item.id_driver;
@@ -1211,6 +1233,9 @@ import jspdf from 'jspdf'
                     else if(item.status_transaksi == 'Sudah lunas (Selesai)'){
                         this.error_message = 'Transaksi Sudah Selesai';
                     }
+                    else if(item.status_transaksi == 'Batal'){
+                        this.error_message = 'Transaksi Sudah DiBatalkan';
+                    }
                    
                 }
             },
@@ -1268,6 +1293,7 @@ import jspdf from 'jspdf'
             this.readData();
             this.readDataBanyakTransaksi();
             this.readDataTransaksiDone();
+            this.readDataTransaksiBatal();
             // this.isAktifOn();
         },
     };

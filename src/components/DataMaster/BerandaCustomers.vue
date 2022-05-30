@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     readData() {
-        var url = this.$api + '/customer/' + 'CUS220506-010';
+        var url = this.$api + '/customer/' + sessionStorage.getItem('id_customer');
         this.$http.get(url, {
             headers: {
                 'Authorization' : 'Bearer ' + localStorage.getItem('token')

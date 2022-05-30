@@ -11,6 +11,7 @@
             <v-btn @click="scrollMeTo('joinus')" plain color="white"> JOIN US </v-btn>
             <v-btn @click="scrollMeTo('about')" plain color="white"> ABOUT </v-btn>
             <v-spacer></v-spacer>
+            <!-- <v-btn @click="goToLogin()" rounded color="#F9A825"> <span class="white--text"> LOGIN </span></v-btn> -->
             <v-btn @click="dialogLogin = true" rounded color="#F9A825"> <span class="white--text"> LOGIN </span></v-btn>
             <v-btn @click="dialogRegister = true" rounded outlined color="#F9A825" style="margin-left: 10px;"> REGISTER </v-btn>
         </v-app-bar>
@@ -135,10 +136,10 @@
                     </v-card-text>
 
                     <v-card-actions>
-                        <span>Sudah punya akun?</span><v-btn color="blue darken-1" text @click="changedialog"> Login </v-btn>
+                        <span>Sudah punya akun?</span><v-btn color="blue darken-1" text @click="goToLogin"> Login </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelRegis"> Cancel </v-btn>
-                        <v-btn color="blue darken-1" text @click="save"> Register </v-btn>
+                        <v-btn class="white--text" color="#00396c" @click="save"> Register </v-btn>
                     </v-card-actions>
                 </v-card>
             </v-hover>
@@ -158,9 +159,9 @@
                         <v-container style="margin-top: 25px;">
                             <v-form v-model="valid" ref="form">
                                 <strong>Email Address</strong>
-                                <v-text-field outlined :rules="emailRules" required ></v-text-field>
+                                <v-text-field outlined :rules="emailRules" required v-model="email"></v-text-field>
                                 <strong>Password</strong>
-                                <v-text-field outlined @click:append="show1 = !show1" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'" :rules="passwordRules" required></v-text-field>
+                                <v-text-field v-model="password" outlined @click:append="show1 = !show1" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'" :rules="passwordRules" required></v-text-field>
                             </v-form>
                         </v-container>
                     </v-card-text>
@@ -168,7 +169,7 @@
                         <span>Belom punya akun?</span><v-btn color="blue darken-1" text @click="changedialog1"> Register </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelLogin"> Cancel </v-btn>
-                        <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" @click="setForm"> <span style="color: white;"> Login </span></v-btn>
+                        <v-btn :class=" { valid, disabled: !valid }" color="blue darken-1" @click="submit"> <span style="color: white;"> Login </span></v-btn>
                     </v-card-actions>
                 </v-card>
             </v-hover>
@@ -190,11 +191,11 @@
         </v-snackbar>
 
         <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
-            <div v-for="(errorArray, index) in error_message" :key="index">
-                <div v-for="(error_message, index) in errorArray" :key="index">
+            <!-- <div v-for="(errorArray, index) in error_message" :key="index"> -->
+                <!-- <div v-for="(error_message, index) in errorArray" :key="index"> -->
                     {{ error_message }}
-                </div>
-            </div>
+                <!-- </div> -->
+            <!-- </div> -->
         </v-snackbar>
 
     </v-main>
@@ -223,6 +224,8 @@ export default {
             dialogRegister: false,
             valid: false,
             show1: false,
+            email: null,
+            password: null,
             logo: require('@/assets/logo_ajr.png'),
             logo_con1: require('@/assets/5230.jpg'),
             logo_join: require('@/assets/imgbin_car-rental-taxi-enterprise-rent-a-car-renting-png.png'),
@@ -255,9 +258,9 @@ export default {
         };
     },
     methods: {
-        // clear(){
-        //     this.$refs.form.reset();
-        // },
+        clear(){
+            this.$refs.form.reset();
+        },
 
         scrollMeTo(refName) {
             var element = this.$refs[refName];
@@ -266,20 +269,27 @@ export default {
             window.scrollTo(0, top);
         },
 
-        register(){
-            this.$router.push({
-                name: 'Register',
+        goToLogin(){
+             this.$router.push({
+                name: 'Login',
             });
         },
 
-        clear() {
-            this.$refs.form.reset();
-            // this.$refs.form1.reset();
-            // this.resetForm();
-            // this.load = true;
-            // location.reload();
-            // this.$refs.form.resetForm(); // clear form login
-        },
+        // register(){
+        //     this.clear();
+        //     this.$router.push({
+        //         name: 'Register',
+        //     });
+        // },
+
+        // clear() {
+        //     this.$refs.form.reset();
+        //     // this.$refs.form1.reset();
+        //     // this.resetForm();
+        //     // this.load = true;
+        //     // location.reload();
+        //     // this.$refs.form.resetForm(); // clear form login
+        // },
 
         cancelLogin() {
             this.clear();
@@ -291,6 +301,7 @@ export default {
         cancelRegis(){
             this.clear();
             this.dialogRegister = false;
+            location.reload();
             // this.$refs.fileGambar
             // this.$refs.fileGambar.value = null;
             // this.$refs.fileSim = '';
@@ -306,6 +317,63 @@ export default {
             this.clear();
             this.dialogRegister = true;
             this.dialogLogin = false;
+        },
+
+        submit(){
+            let url = this.$api + "/login";
+            this.$http.post(url, {
+                email: this.email,
+                password: this.password,
+            }).then((response)=> {
+                if(response.data.data.id_customer != null) {
+                    sessionStorage.setItem("token", response.data.token);
+                    sessionStorage.setItem("id_customer", response.data.data.id_customer);
+                    sessionStorage.setItem("nama_customer", response.data.data.nama_customer);
+                    sessionStorage.setItem("email", response.data.data.email_customer);
+                    this.$router.push({
+                        name: 'ProfileCustomer',
+                    });
+                }
+                else if(response.data.data.id_pegawai != null) {
+                    sessionStorage.setItem("token", response.data.token);
+                    sessionStorage.setItem("id_pegawai", response.data.data.id_pegawai);
+                    sessionStorage.setItem("email", response.data.data.email);
+                    sessionStorage.setItem("nama_pegawai",response.data.data.nama_pegawai);
+                    sessionStorage.setItem("id_role", response.data.data.id_role);
+                    if(response.data.data.id_role == 1){
+                        this.$router.push({
+                            name: 'Promo',
+                        });
+                    }
+                    else if(response.data.data.id_role == 2){
+                        this.$router.push({
+                            name: 'Mitra',
+                        });
+                    }
+                    else if(response.data.data.id_role == 3){
+                        this.$router.push({
+                            name: 'DataCustomer',
+                        });
+                    }
+                }
+                else{
+                    return false;
+                }
+
+                // this.$router.push("/dashboard");
+                // this.error_message = response.data.message;
+                // this.color = "blue";
+                // this.snackbar = true;
+                // this.clear();
+                // this.load = false;
+            })
+            .catch((error) => {
+                this.error_message = error.response.data.message;
+                this.color = "red";
+                this.snackbar1 = true;
+                localStorage.removeItem("token");
+                this.load = false;
+            })
         },
 
         save(){
@@ -343,10 +411,10 @@ export default {
                         visible: true
                     };
                     this.load = true;
+                    // location.reload();
                     this.close();
                     this.readData();
                     this.clear();
-                    location.reload();
                 }).catch(error => {
                     this.error_message = error.response.data.message;
                     this.color = "red";
@@ -358,6 +426,7 @@ export default {
 
         close(){
             this.dialogRegister = false;
+            this.clear();
             this.resetForm();
             this.load = true;
         },
@@ -443,7 +512,7 @@ export default {
     }
 
 /* HOVER UNTUK STEP */
-    .cardLuar {
+    /* .cardLuar {
         border-radius: 50px;
         padding: 20px;
     }
@@ -454,6 +523,5 @@ export default {
 
     .v-card:not(.on-hover) {
         opacity: 0.6;
-        /* background-color: yellow; */
-    }
+    } */
 </style>

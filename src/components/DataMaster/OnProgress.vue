@@ -1,8 +1,8 @@
 <template>
     <v-main class="list">
-        <h3 v-if="(this.count - this.countDone) != 0" style="font-size: 35px" mb-5> Transaksi Yang Sedang Berjalan </h3>
+        <h3 v-if="(this.count - this.countDone - this.countBatal) != 0" style="font-size: 35px" mb-5> Transaksi Yang Sedang Berjalan </h3>
 
-        <div style="margin-top: 25px;" v-if="(this.count - this.countDone) == 0">
+        <div style="margin-top: 25px;" v-if="(this.count - this.countDone - this.countBatal) == 0">
             <v-img style="margin-left: auto; margin-right: auto ; position: absolute; opacity: 0.2; bottom: 0; right: 0; left: 0; object-fit:cover;" 
                 :src="logo" max-width="485" max-height="485">
             </v-img>
@@ -16,7 +16,7 @@
             <v-icon size="45" style="position: fixed; bottom: 0; right: 0; margin: 0 240px 40px 0px;" color="#00396c">mdi-arrow-right</v-icon>
         </div>
         
-        <v-card style='margin-top: 20px' v-if="(this.count - this.countDone) != 0">
+        <v-card style='margin-top: 20px' v-if="(this.count - this.countDone - this.countBatal) != 0">
             <v-data-table :headers="headers" :items="transaksis" :search="search">
                 <template v-if="temp_banyak" v-slot:[`item.jumlah`]="{item}">
                     <span v-if="item.jumlah < 30 || item.jumlah > 0"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Tersedia</strong></v-chip></span>
@@ -36,6 +36,7 @@
                     <span v-if="item.status_transaksi == 'Menunggu Verifikasi'"><v-chip label color="indigo lighten-4" text-color="indigo darken-4"><strong>Menunggu Verifikasi</strong></v-chip></span>
                     <span v-else-if="item.status_transaksi == 'On Progress'"><v-chip label color="orange lighten-4" text-color="orange darken-4"><strong>On Progress</strong></v-chip></span>
                     <span v-else-if="item.status_transaksi == 'Sudah Bayar, Menunggu Verifikasi'"><v-chip label color="blue lighten-4" text-color="blue darken-4"><strong>Sudah Bayar, Menunggu Verifikasi</strong></v-chip></span>
+                    <span v-else-if="item.status_transaksi == 'Batal'"><v-chip label color="pink lighten-4" text-color="pink darken-4"><strong>Batal</strong></v-chip></span>
                     <span v-else><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Sudah lunas (Selesai)</strong></v-chip> </span>
                 </template>
                 <template v-slot:[`item.actions`]= "{ item }">
@@ -592,6 +593,7 @@ import jspdf from 'jspdf'
                 logo: require('@/assets/logo_ajr.png'),
                 count: 0,
                 countDone: 0,
+                countBatal: 0,
                 dialogDetail: false,
                 metodeBayar: '',
                 dialogBayar: false,
@@ -688,7 +690,7 @@ import jspdf from 'jspdf'
         methods: {
 
             newTransaksi(){
-                if((this.count - this.countDone) >= 1){
+                if((this.count - this.countDone - this.countBatal) >= 1){
                     this.snackbar = {
                         color: "info",
                         icon: "mdi-information-outline",
@@ -730,7 +732,7 @@ import jspdf from 'jspdf'
             },
             // Read Data Customers
             readData() {
-                var url = this.$api + '/showbycustomerOnProgress/' + 'CUS220506-010';
+                var url = this.$api + '/showbycustomerOnProgress/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -743,7 +745,7 @@ import jspdf from 'jspdf'
 
             // readDataTransaksi() {
             //     this.temp_banyak = true;
-            //     var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+            //     var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
             //     console.log(url)
             //     this.$http.get(url, {
             //         headers: {
@@ -756,7 +758,7 @@ import jspdf from 'jspdf'
 
             readDataBanyakTransaksi() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+                var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -768,13 +770,25 @@ import jspdf from 'jspdf'
 
             readDataTransaksiDone() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransactionDone/' + 'CUS220506-010';
+                var url = this.$api + '/countTransactionDone/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
                     }
                 }).then(response => {
                     this.countDone = response.data.data;
+                })
+            },
+
+            readDataTransaksiBatal() {
+                this.temp_banyak = true;
+                var url = this.$api + '/countTransactionBatal/' + sessionStorage.getItem('id_customer');
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.countBatal = response.data.data;
                 })
             },
 
@@ -1265,6 +1279,7 @@ import jspdf from 'jspdf'
             this.readData();
             this.readDataBanyakTransaksi();
             this.readDataTransaksiDone();
+            this.readDataTransaksiBatal();
             // this.isAktifOn();
         },
     };

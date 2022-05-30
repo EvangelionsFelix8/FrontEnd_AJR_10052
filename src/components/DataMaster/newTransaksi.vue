@@ -519,8 +519,26 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <!-- <v-btn color="blue darken-1" text @click="cancel"> Cancel </v-btn> -->
-                    <v-btn v-if="this.$route.params.items != null" class="white--text" color="#00396c" @click="getValueRating"> EDIT </v-btn>
+                    <v-btn v-if="this.$route.params.items != null" class="white--text" color="#00396c" @click="dialogConfirmUpdate = true"> EDIT </v-btn>
                     <v-btn v-else class="white--text" color="#00396c" @click="save"> SEWA </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="dialogConfirmUpdate" persistent max-width="400px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Warning!</span>
+                </v-card-title>
+
+                <v-card-text>
+                    Apakah Kamu Yakin ingin Mengupdate Data Transaksi Kamu?
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="dialogConfirmUpdate = false"> No </v-btn>
+                    <v-btn color="blue darken-1" text @click="getValueRating"> Yes </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -577,11 +595,11 @@
         </v-snackbar>
 
         <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
-            <!-- <div v-for="(errorArray, index) in error_message" :key="index"> -->
-                <!-- <div v-for="(error_message, index) in errorArray" :key="index"> -->
+            <div v-for="(errorArray, index) in error_message" :key="index">
+                <div v-for="(error_message, index) in errorArray" :key="index">
                     {{ error_message }}
-                <!-- </div> -->
-            <!-- </div> -->
+                </div>
+            </div>
         </v-snackbar>
 
     </v-main>
@@ -638,6 +656,7 @@
                 dialogConfirm: false,
                 dialogTransaksi: false,
                 dialogRatingAJR: false,
+                dialogConfirmUpdate: false,
                 rating: 0,
                 drawer: false,
                 valid: false,
@@ -757,19 +776,27 @@
                     this.error_message = 'Anda Belum Memiliki SIM, silakan Sewa dengan driver';
                 }
                 else{
-                    this.transaksi.append('id_customer', 'CUS220506-010');
-                    if(this.selectedId_driver !== ''){
+                    this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
+                    if(this.selectedId_driver !== null){
                         this.transaksi.append('id_driver', this.selectedId_driver);
+                        console.log('id_driver', this.selectedId_driver);
                     }
                     else{
                         this.transaksi.append('id_driver', []);
+                        console.log('else ', this.selectedId_driver);
                     }
+                    // else{
+                    //     this.transaksi.append('id_driver', '');
+                    //     console.log('else ', this.selectedId);
+                    // }
 
-                    if(this.selectedId !== ''){
+                    if(this.selectedId > 0){
                         this.transaksi.append('id_promo', this.selectedId);
+                       console.log('if promo', this.selectedId);
                     }
                     else{
                         this.transaksi.append('id_promo', '');
+                        console.log('else promo', this.selectedId);
                     }
     
                     this.transaksi.append('id_mobil', this.selectedId_mobil);
@@ -847,7 +874,7 @@
                 if(n === 3){
                     this.temp_jenis = '';
                     this.potonganPromo = 0;
-                    this.selectedId = '';
+                    this.selectedId = 'null';
                     this.previousSelectedId = null;
                 }
                 else if(n === 2){
@@ -1071,7 +1098,7 @@
             },
 
             readDataCustomer() {
-                var url = this.$api + '/customer/' + 'CUS220506-010';
+                var url = this.$api + '/customer/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -1083,7 +1110,7 @@
 
             readDataTransaksi() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+                var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -1095,7 +1122,7 @@
 
             readDataBanyakTransaksi() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+                var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -1107,7 +1134,7 @@
 
             readDataTransaksiDone() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransactionDone/' + 'CUS220506-010';
+                var url = this.$api + '/countTransactionDone/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -1131,7 +1158,7 @@
                     this.error_message = 'Anda Belum Memiliki SIM, silakan Sewa dengan driver';
                 }else{
                     // this.transaksi.append('id_driver', localStorage.getItem('id'));
-                    // this.transaksi.append('id_customer', 'CUS220506-010');
+                    // this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
                     // if(this.selectedId_driver !== ''){
                     //     this.transaksi.append('id_driver', this.selectedId_driver);
                     // }
@@ -1211,7 +1238,7 @@
                                     visible: true
                                 };
                                 this.dialogTransaksi = false;
-                                // this.transaksi.append('id_customer', 'CUS220506-010');
+                                // this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
                                 // if(this.selectedId_driver !== ''){
                                 //     this.transaksi.append('id_driver', this.selectedId_driver);
                                 // }
@@ -1267,7 +1294,6 @@
             goToTransaksi(){
                 this.$router.push({
                     name: 'Transaksi',
-                    
                 });
             },
 
@@ -1440,7 +1466,7 @@
 
             update(){
                 var object = this.$route.params.items;
-                this.transaksi.append('id_customer', 'CUS220506-010');
+                this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
                 if(this.selectedId_driver !== ''){
                     this.transaksi.append('id_driver', this.selectedId_driver);
                 }
@@ -1526,6 +1552,7 @@
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
                 this.dialogTransaksi = false;
+                this.dialogConfirmUpdate = false;
                 this.readData();
             },
 
@@ -1533,6 +1560,7 @@
                 // this.resetForm();
                 // this.readData();
                 // this.clear();
+                this.dialogConfirmUpdate = false;
                 this.dialogTransaksi = false;
             },
 

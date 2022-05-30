@@ -37,7 +37,7 @@
                     <v-card class="amber darken-1" style="position: relative;">
                         <v-icon class="idinformasi" size="115">mdi-progress-clock</v-icon>
                         <v-card-title class="cardtitle" style="padding-left: 40%;"> On Progress </v-card-title>
-                        <v-card-text class="cardtext">{{this.count - this.countDone}}</v-card-text>
+                        <v-card-text class="cardtext">{{this.count - this.countDone - this.countBatal}}</v-card-text>
                     </v-card>
                 </v-col>
             </v-row>
@@ -46,7 +46,7 @@
                     <v-card class="red darken-1" style="position: relative;">
                         <v-icon class="idinformasi" size="115">mdi-alert-circle-outline</v-icon>
                         <v-card-title class="cardtitle"> Transaksi Gagal </v-card-title>
-                        <v-card-text class="cardtext">0</v-card-text>
+                        <v-card-text class="cardtext">{{this.countBatal}}</v-card-text>
                     </v-card>
                 </v-col>
                 <v-col>
@@ -138,7 +138,25 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <!-- <v-btn color="blue darken-1" text @click="dialog = false"> Cancel </v-btn> -->
-                    <v-btn color="blue darken-1" text @click="update"> Save </v-btn>
+                    <v-btn color="blue darken-1" text @click="dialogConfirmUpdate = true"> Save </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="dialogConfirmUpdate" persistent max-width="400px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Warning!</span>
+                </v-card-title>
+
+                <v-card-text>
+                    Apakah Kamu Yakin ingin Mengupdate Data Kamu?
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="dialogConfirmUpdate = false"> No </v-btn>
+                    <v-btn color="blue darken-1" text @click="update"> Yes </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -231,6 +249,7 @@
                 load: false,
                 count: 0,
                 countDone: 0,
+                countBatal: 0,
                 snackbar1: false,
                 snackbar: {
                     color: null,
@@ -251,6 +270,7 @@
                 dialog: false,
                 dialogConfirm: false,
                 dialogVerifikasi: false,
+                dialogConfirmUpdate: false,
                 messageRules: [
                     (v) => !!v || 'This Field is Required !',
                 ],
@@ -271,7 +291,7 @@
                     {text: "Perempuan", value: "Perempuan"},
                 ],
                 customer: new FormData,
-                customers: [],
+                customers: {},
                 transaksis: [],
                 form: {
                     nama_customer: null,
@@ -315,7 +335,7 @@
             },
             // Read Data Customers
             readData() {
-                var url = this.$api + '/customer/' + 'CUS220506-010';
+                var url = this.$api + '/customer/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -327,7 +347,7 @@
 
             readDataBanyakTransaksi() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransaction/' + 'CUS220506-010';
+                var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
@@ -339,14 +359,25 @@
 
             readDataTransaksiDone() {
                 this.temp_banyak = true;
-                var url = this.$api + '/countTransactionDone/' + 'CUS220506-010';
+                var url = this.$api + '/countTransactionDone/' + sessionStorage.getItem('id_customer');
                 this.$http.get(url, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
                     }
                 }).then(response => {
                     this.countDone = response.data.data;
-                    console.log(this.countDone);
+                })
+            },
+
+            readDataTransaksiBatal() {
+                this.temp_banyak = true;
+                var url = this.$api + '/countTransactionBatal/' + sessionStorage.getItem('id_customer');
+                this.$http.get(url, {
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then(response => {
+                    this.countBatal = response.data.data;
                 })
             },
 
@@ -496,6 +527,7 @@
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
+                this.dialogConfirmUpdate = false;
                 this.readData();
             },
 
@@ -506,6 +538,7 @@
                 this.dialog = false;
                 this.dialogConfirm = false;
                 this.dialogVerifikasi = false;
+                this.dialogConfirmUpdate = false;
             },
 
             resetForm(){
@@ -537,6 +570,7 @@
             this.readData();
             this.readDataBanyakTransaksi();
             this.readDataTransaksiDone();
+            this.readDataTransaksiBatal();
             // this.isAktifOn();
         },
     };

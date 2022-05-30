@@ -4,7 +4,7 @@
             <!-- <v-toolbar color="yellow darken-1"> -->
             <v-list-item class="blue darken-4">
                 <v-list-item-content>
-                    <v-list-item-title class="title"> Evangelions Felix Yehdeya GSD </v-list-item-title>
+                    <v-list-item-title class="title"> {{ pegawais.nama_pegawai }} </v-list-item-title>
                     <v-list-item-subtitle> Login as: ADMIN </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
@@ -54,7 +54,8 @@ export default {
     name: "Dashboard",
     data() {
         return {
-            drawer: true, 
+            drawer: true,
+            pegawais: [],
             items: [
                 // { icon: 'mdi-view-dashboard',title: "Dashboard", to: "/dashboard"},
                 // { icon: 'mdi-account-tie', title: 'Role', to: '/role'},
@@ -72,6 +73,17 @@ export default {
         };
     },
     methods: {
+        readData() {
+            var url = this.$api + '/pegawai/' + sessionStorage.getItem('id_pegawai');
+            this.$http.get(url, {
+                headers: {
+                    'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                }
+            }).then(response => {
+                this.pegawais = response.data.data;
+            })
+        },
+
         logout(){
             // localStorage.removeItem('id');
             // localStorage.removeItem('token');
@@ -81,6 +93,10 @@ export default {
             });
             // location.reload();
         }
+    },
+
+    mounted(){
+        this.readData();
     }
 };
 </script>

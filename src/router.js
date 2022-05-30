@@ -165,7 +165,7 @@ const router = new VueRouter({
 
         {
             path: "/customer",
-            name: "customer",
+            name: "Customer",
             component: importComponent("DashboardLayoutCustomer"),
             children: [
                 {
