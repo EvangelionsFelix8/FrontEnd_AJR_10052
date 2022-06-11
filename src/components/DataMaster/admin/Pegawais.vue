@@ -104,7 +104,25 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="cancel"> Cancel </v-btn>
-                    <v-btn color="blue darken-1" text @click="setForm"> Save </v-btn>
+                    <v-btn color="blue darken-1" text @click="dialogConfirmUpdate = true"> Save </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="dialogConfirmUpdate" persistent max-width="400px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Warning!</span>
+                </v-card-title>
+
+                <v-card-text>
+                    Apakah Kamu Yakin ingin {{this.inputType}} Data Pegawai Ini?
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="dialogConfirmUpdate = false"> No </v-btn>
+                    <v-btn color="blue darken-1" text @click="setForm"> Yes </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -177,6 +195,7 @@
                 overlay: false,
                 dialog: false,
                 dialogConfirm: false,
+                dialogConfirmUpdate: false,
                 urlFoto: null,
                 valid: false,
                 messageRules: [
@@ -441,6 +460,7 @@
                 this.dialog = false;
                 this.inputType = 'Tambah';
                 this.dialogConfirm = false;
+                this.dialogConfirmUpdate = false;
                 this.readData();
             },
 
@@ -455,6 +475,7 @@
                 this.clear();
                 this.dialog = false;
                 this.dialogConfirm = false;
+                this.dialogConfirmUpdate = false;
                 this.inputType = 'Tambah';
             },
 
