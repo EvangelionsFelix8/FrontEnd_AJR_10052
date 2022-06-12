@@ -136,7 +136,7 @@
                     </v-card-text>
 
                     <v-card-actions>
-                        <span>Sudah punya akun?</span><v-btn color="blue darken-1" text @click="goToLogin"> Login </v-btn>
+                        <span>Sudah punya akun?</span><v-btn color="blue darken-1" text @click="changedialog"> Login </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="cancelRegis"> Cancel </v-btn>
                         <v-btn class="white--text" color="#00396c" @click="save"> Register </v-btn>
@@ -393,7 +393,7 @@ export default {
                     this.customer.append('no_sim', temp_sim.files[0]);
                 }
 
-                var url = this.$api + '/customer/'
+                var url = this.$api + '/customer'
                 this.load = true;
                 this.$http.post(url, this.customer, {
                     headers: {

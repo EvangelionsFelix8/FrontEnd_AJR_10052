@@ -258,7 +258,7 @@
                 this.mitra.append('isAktif', this.form.isAktif);
 
 
-                var url = this.$api + '/mitra/'
+                var url = this.$api + '/mitra'
                 this.load = true;
                 this.$http.post(url, this.mitra, {
                     headers: {

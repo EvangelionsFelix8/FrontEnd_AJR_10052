@@ -596,7 +596,7 @@
                 // this.detailjadwal.append('nama_role', this.form.nama_role);
                 // this.detailjadwal.append('shift', this.form.shift);
 
-                var url = this.$api + '/detailjadwal/'
+                var url = this.$api + '/detailjadwal'
                 this.load = true;
                 this.$http.post(url, this.detailjadwal, {
                     headers: {

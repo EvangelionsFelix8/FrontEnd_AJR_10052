@@ -227,7 +227,7 @@
                 this.jadwal.append('hari_kerja', this.form.hari_kerja);
                 this.jadwal.append('shift', this.form.shift);
 
-                var url = this.$api + '/jadwal/'
+                var url = this.$api + '/jadwal'
                 this.load = true;
                 this.$http.post(url, this.jadwal, {
                     headers: {

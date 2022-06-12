@@ -249,7 +249,7 @@
                 this.promo.append('status_promo', this.form.status_promo);
                 this.promo.append('keterangan', this.form.keterangan);
 
-                var url = this.$api + '/promo/'
+                var url = this.$api + '/promo'
                 this.load = true;
                 this.$http.post(url, this.promo, {
                     headers: {

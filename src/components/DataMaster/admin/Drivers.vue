@@ -540,7 +540,7 @@
                 // this.driver.append('rerata_rating_driver',this.form.rerata_rating_driver);
                 this.driver.append('isAktif',this.form.isAktif);
 
-                var url = this.$api + '/driver/'
+                var url = this.$api + '/driver'
                 this.load = true;
                 this.$http.post(url, this.driver, {
                     headers: {

@@ -161,11 +161,11 @@
         </v-snackbar>
 
         <v-snackbar v-model="snackbar1" :color="color" timeout="2000" bottom>
-            <div v-for="(errorArray, index) in error_message" :key="index">
-                <div v-for="(error_message, index) in errorArray" :key="index">
+            <!-- <div v-for="(errorArray, index) in error_message" :key="index"> -->
+                <!-- <div v-for="(error_message, index) in errorArray" :key="index"> -->
                     {{ error_message }}
-                </div>
-            </div>
+                <!-- </div> -->
+            <!-- </div> -->
         </v-snackbar>
 
     </v-main>
@@ -309,7 +309,7 @@
                 var temp_foto = document.getElementById("file");
                 this.pegawai.append('url_foto_pegawai', temp_foto.files[0]);
 
-                var url = this.$api + '/pegawai/'
+                var url = this.$api + '/pegawai'
                 this.load = true;
                 this.$http.post(url, this.pegawai, {
                     headers: {

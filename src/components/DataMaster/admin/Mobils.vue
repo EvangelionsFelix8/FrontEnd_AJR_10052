@@ -498,7 +498,7 @@
                 var temp_foto = document.getElementById("file");
                 this.mobil.append('url_foto_mobil', temp_foto.files[0]);
 
-                var url = this.$api + '/mobil/'
+                var url = this.$api + '/mobil'
                 this.load = true;
                 this.$http.post(url, this.mobil, {
                     headers: {

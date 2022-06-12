@@ -57,15 +57,11 @@
                                 <v-row align="center" class="justify-center" style="margin-bottom: 10px;">
                                     <v-rating
                                     :value="rata2s[i].rata_rating" color="amber" dense half-increments readonly size="14"></v-rating>
-
-                                    <!-- <v-card-text class="white--text">{{driver.rerata_rating_driver}}</v-card-text> -->
                                     <div class="white--text ms-4" style="margin-left: 15px; font-size: 15px;">
                                         <span v-if="rata2s[i].rata_rating != null">{{rata2s[i].rata_rating}}</span>
                                         <span v-else>0</span>
-                                        <!-- {{driver.rerata_rating_driver}} -->
                                     </div>
                                 </v-row>
-                                <!-- <v-card-text class="white--text">{{driver.rerata_rating_driver}}<v-icon color="yellow darken-2"> mdi-star </v-icon></v-card-text> -->
                                 <v-card-subtitle class="white--text">Tarif Sewa<span style="margin-left: 13%"> : Rp {{driver.tarif_sewa_driver.toString().replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1\.")}} </span></v-card-subtitle>
                                 <v-card-text class="white--text">
                                     Bahasa Inggris : 
@@ -187,184 +183,6 @@
                 </v-stepper-items>
             </v-stepper>
         </v-card>
-
-        <!-- <v-chip-group active-class="white--text">
-            <v-chip
-                filter
-                color="white"
-                style="margin-top: 20px"
-                text-color="primary"
-                @click="readData"
-            > All </v-chip>
-
-            <v-chip
-                filter
-                color="white"
-                style="margin-top: 20px; margin-left: 10px"
-                text-color="primary"
-                @click='isAktifOn'
-            > Active only</v-chip>
-
-            <v-chip
-                filter
-                color="white"
-                style="margin-top: 20px; margin-left: 10px"
-                text-color="primary"
-                @click='getExpireSoon'
-            > Expire Soon</v-chip>
-        </v-chip-group> -->
-        
-        <!-- <v-card style='margin-top: 20px'>
-            <v-data-table :headers="headers" :items="mobils" :search="search">
-                <template v-slot:[`item.jenis_bahan_bakar`]="{item}">
-                    <span v-if="item.jenis_bahan_bakar == 'Pertalite'"><strong style="color: green">Pertalite</strong></span>
-                    <span v-else><strong style="color: blue">Pertamax</strong> </span>
-                </template>
-                <template v-slot:[`item.volume_bahan_bakar`]="{item}">
-                    <span>
-                        {{ item.volume_bahan_bakar }} L</span>
-                </template>
-                <template v-slot:[`item.kapasitas_penumpang`]="{item}">
-                    <span>
-                        {{ item.kapasitas_penumpang }} Orang</span>
-                </template>
-                <template v-slot:[`item.harga_sewa_mobil`]="{item}">
-                    <span>
-                        Rp. {{ item.harga_sewa_mobil }}</span>
-                </template>
-                <template v-slot:[`item.kategori_aset`]="{item}">
-                    <span v-if="item.id_mitra == null"><v-chip label color="blue lighten-4" text-color="blue darken-4"><strong>Perusahaan</strong></v-chip></span>
-                    <span v-else><v-chip label color="orange lighten-4" text-color="orange darken-4"><strong>Mitra</strong></v-chip> </span>
-                </template>
-                <template v-slot:[`item.status_ketersediaan`]="{item}">
-                    <span v-if="item.status_ketersediaan == 'Tersedia'"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Tersedia</strong></v-chip></span>
-                    <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Tersedia</strong></v-chip> </span>
-                </template>
-                <template v-if="temp_sisa" v-slot:[`item.sisa_hari`]="{item}">
-                    <span v-if="item.sisa_hari < 30 || item.sisa_hari > 0"><v-chip label color="green lighten-4" text-color="green darken-4"><strong>Tersedia</strong></v-chip></span>
-                    <span v-else><v-chip label color="red lighten-4" text-color="red darken-4"><strong>Tidak Tersedia</strong></v-chip> </span>
-                </template>
-                <template v-slot:[`item.actions`]= "{ item }">
-                    <v-menu>
-                        <template v-slot:activator="{ on: menu, attrs }">
-                            <v-tooltip bottom>
-                            <template v-slot:activator="{ on: tooltip }">
-                                <v-btn icon v-bind="attrs" v-on="{ ...tooltip, ...menu }">
-                                <v-icon dark color="black" center> mdi-dots-vertical </v-icon> </v-btn>
-                            </template>
-                            <span>Click me!</span>
-                            </v-tooltip>
-                        </template>
-                        <v-list>
-                            <v-list-item-title><v-btn style="min-width: 100px;" small @click="detailScreen(item)"> Detail </v-btn></v-list-item-title>
-                            <v-list-item-title><v-btn style="min-width: 100px;" small @click="editHandler(item)"> Edit </v-btn></v-list-item-title>
-                            <v-list-item-title><v-btn class="red--text" red style="min-width: 100px;" small @click="deleteHandler(item.id_mobil)"> Delete </v-btn></v-list-item-title>
-                        </v-list>
-                    </v-menu>
-                   
-                </template>
-            </v-data-table>
-        </v-card> -->
-
-        <!-- <v-btn small class="mr-2" @click="editHandler(item)"> Edit </v-btn>
-        <v-btn small @click="deleteHandler(item.id)"> Delete </v-btn> -->
-
-        <!-- <v-dialog v-model="dialog" persistent max-width="600px">
-            <v-card>
-                <v-toolbar color="#00396c">
-                    <v-card-title style="margin-left: 200px">
-                        <span class="h6, white--text">{{ formTitle }} Mobil</span>
-                    </v-card-title>
-                </v-toolbar>
-                <v-card-text>
-                    <v-container>
-                        <v-form v-model="valid" ref="form">
-                            <v-radio-group v-model="form.kategori_aset">
-                                <v-radio v-bind:value="0" label="Perusahaan"></v-radio>
-                                <v-radio v-bind:value="1" label="Mitra"></v-radio>
-                            </v-radio-group>
-                            <v-select v-if="isMitra()" :rules="messageRules" :items="mitras" clearable v-model="form.id_mitra" label="Mitra" item-value="id_mitra" item-text="nama_mitra"></v-select>
-                            <v-text-field :rules="messageRules" v-model="form.nama_mobil" label="Nama Mobil" required></v-text-field>
-                            <v-select :rules="messageRules" :items="tipeMobils" v-model="form.tipe_mobil" label="Tipe Mobil" item-value="tipe_mobil" item-text="text"></v-select>
-                            <v-select :rules="messageRules" :items="jenisTransmisis" v-model="form.jenis_transmisi" label="Jenis Transmisi" item-value="value" item-text="text"></v-select>
-                            <v-select :rules="messageRules" :items="jenisBahanBakars" v-model="form.jenis_bahan_bakar" label="Jenis Bahan Bakar" item-value="value" item-text="text"></v-select>
-                            <v-text-field :rules="messageRules" v-model="form.warna_mobil" label="Warna Mobil" required></v-text-field>
-                            <v-text-field :rules="messageRules" v-model="form.volume_bahan_bakar" label="Volume Bahan Bakar" required></v-text-field>
-                            <v-text-field :rules="messageRules" v-model="form.kapasitas_penumpang" label="Kapasitas Penumpang Mobil" required></v-text-field>
-                            <v-text-field :rules="messageRules" v-model="form.harga_sewa_mobil" label="Harga sewa Mobil" required prefix="Rp. "></v-text-field>
-                            <v-text-field :rules="messageRules" v-model="form.plat_nomor" label="Plat Nomor Mobil" required></v-text-field>
-                            <v-text-field :rules="messageRules" v-model="form.nomor_stnk" label="Nomor STNK Mobil" required></v-text-field>
-                            <v-select :rules="messageRules" :items="statusKetersediaans" v-model="form.status_ketersediaan" label="Status Tersedia" item-value="value" item-text="text"></v-select>
-                            <v-file-input :rules="messageRules" rounded filled prepend-icon="mdi-camera" label="Foto Mobil" id="file" ref="fileGambar"></v-file-input>
-                            <v-text-field :rules="messageRules" v-model="form.fasilitas" label="Fasilitas Mobil" required></v-text-field>
-                            <v-text-field v-if="isMitra()" :rules="messageRules" clearable type="date" v-model="form.mulai_kontrak" label="Mulai Kontrak Mobil" required></v-text-field>
-                            <v-text-field v-if="isMitra()" :rules="messageRules" clearable type="date" v-model="form.selesai_kontrak" label="Selesai Kontrak Mobil" required></v-text-field>
-                            <v-text-field :rules="messageRules" type="date" v-model="form.tanggal_servis_terakhir" label="Tanggal Service terakhir Mobil" required></v-text-field>
-                        </v-form>
-                    </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="cancel"> Cancel </v-btn>
-                    <v-btn color="blue darken-1" text @click="setForm"> Save </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog> -->
-
-        <!-- <v-dialog v-model="dialogConfirm" persistent max-width="400px">
-            <v-card>
-                <v-card-title>
-                    <span class="headline">Warning!</span>
-                </v-card-title>
-
-                <v-card-text>
-                    Anda Yakin Ingin menghapus Mobil ini?
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="dialogConfirm = false"> Cancel </v-btn>
-                    <v-btn color="blue darken-1" text @click="deleteData"> Delete </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog> -->
-
-        <!-- DRAWER BUAT DETAIL -->
-                <!-- <v-navigation-drawer absolute temporary hide-overlay right v-model="drawer" height="550" class="fullheight">
-                    <template>
-                        <v-app-bar fixed color="#00396c">
-                            <h2 style="color: white;">Detail Mobil : <span style="margin-left: 205px"><v-icon color="white" @click="drawer = !drawer">mdi-close-thick </v-icon></span></h2> 
-                        </v-app-bar>
-                    </template>
-                    
-
-                    <v-divider></v-divider>
-
-                    <v-list style="padding-left: 20px;">
-                        <v-list-item-content>
-                            <v-list-item-title style="margin-top: 60px; margin-left: 40px;">
-                                    <v-img @click="overlay = !overlay" :src="$baseUrl+'/storage/'+this.data.url_foto_mobil" height="150px" width="300px" style="object-fit:cover"/> 
-                            </v-list-item-title>
-                            <v-list-item-title style="margin-top: 20px; margin-bottom: 20px;"><strong> Nama Mobil <span style="margin-left: 97px;"> :</span> </strong> {{this.data.nama_mobil}}</v-list-item-title>
-                            <v-list-item-title style="margin-bottom: 20px;"><strong> Plat Nomor <span style="margin-left: 103px;"> :</span> </strong> {{this.data.plat_nomor}}</v-list-item-title>
-                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Mulai Kontrak <span style="margin-left: 23px;"> :</span> </strong> 
-                                <span v-if="this.data.mulai_kontrak !== null"> {{this.data.mulai_kontrak}} </span>
-                                <span v-else> - </span>
-                            </v-list-item-title>
-                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Selesai Kontrak <span style="margin-left: 10px;"> :</span> </strong> 
-                                <span v-if="this.data.selesai_kontrak !== null"> {{this.data.selesai_kontrak}} </span>
-                                <span v-else> - </span>
-                            </v-list-item-title>
-                            <v-list-item-title style="margin-bottom: 20px;"><strong> Tanggal Servis Terakhir <span style="margin-left: 15px;"> :</span> </strong> {{this.data.tanggal_servis_terakhir}}</v-list-item-title>
-                            <v-list-item-title style="margin-bottom: 20px;"><strong> Sisa Kontrak <span style="margin-left: 95px;"> :</span> </strong> 
-                                <span v-if="this.data.sisa_hari > 0"> <span  style="color: red; font-weight: bold;"> {{this.data.sisa_hari}}</span> Hari Lagi  </span>
-                                <span v-else-if="this.data.sisa_hari == null"> <v-chip style="margin-left: 20px" label color="green lighten-4" text-color="green darken-4"> <strong> Unlimited </strong> </v-chip></span>
-                                <span v-else> <v-chip style="margin-left: 20px" label color="red lighten-4" text-color="red darken-4"> <strong> Expired </strong> </v-chip></span>
-                            </v-list-item-title>
-                        </v-list-item-content>
-                    </v-list>
-                </v-navigation-drawer> -->
 
         <v-dialog v-model="dialogTransaksi" persistent max-width="700px">
             <v-card>
@@ -838,7 +656,7 @@
                         });
                     }else{
                         this.transaksi.append('rating_ajr', this.rating);
-                        url = this.$api + '/transaksi/'
+                        url = this.$api + '/transaksi'
                         this.load = true;
                         this.$http.post(url, this.transaksi, {
                             headers: {
@@ -1157,38 +975,6 @@
                     };
                     this.error_message = 'Anda Belum Memiliki SIM, silakan Sewa dengan driver';
                 }else{
-                    // this.transaksi.append('id_driver', localStorage.getItem('id'));
-                    // this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
-                    // if(this.selectedId_driver !== ''){
-                    //     this.transaksi.append('id_driver', this.selectedId_driver);
-                    // }
-                    // else{
-                    //     this.transaksi.append('id_driver', []);
-                    // }
-                    
-    
-                    // if(this.selectedId === ''){
-                    //     this.transaksi.append('id_promo', this.selectedId);
-                    // }
-                    // else{
-                    //     this.transaksi.append('id_promo', '');
-                    // }
-    
-                    // this.transaksi.append('id_mobil', this.selectedId_mobil);
-                    // this.transaksi.append('tanggal_mulai', this.merge_mulai_sewa);
-                    // this.transaksi.append('tanggal_selesai', this.merge_selesai_sewa);
-                    // this.transaksi.append('total_sewa_mobil', this.totalSewaMobil);
-                    // this.transaksi.append('total_sewa_driver', this.totalSewaDriver);
-                    // this.transaksi.append('total_harga', this.totalHarga);
-                    // this.transaksi.append('potongan_promo', this.totalPromo);
-    
-                    // var url = this.$api + '/transaksi/'
-                    // this.load = true;
-                    // this.$http.post(url, this.transaksi, {
-                    //     headers: {
-                    //         'Authorization' : 'Bearer ' + localStorage.getItem('token'),
-                    //     }
-                    // }).then(response => {
                         if(this.selectedId_mobil == ''){
                             this.error_message = 'Silakan Pilih Mobil yang Diinginkan';
                             this.snackbar = {
@@ -1238,29 +1024,6 @@
                                     visible: true
                                 };
                                 this.dialogTransaksi = false;
-                                // this.transaksi.append('id_customer', sessionStorage.getItem('id_customer'));
-                                // if(this.selectedId_driver !== ''){
-                                //     this.transaksi.append('id_driver', this.selectedId_driver);
-                                // }
-                                // else{
-                                //     this.transaksi.append('id_driver', []);
-                                // }
-                                
-
-                                // if(this.selectedId !== ''){
-                                //     this.transaksi.append('id_promo', this.selectedId);
-                                // }
-                                // else{
-                                //     this.transaksi.append('id_promo', '');
-                                // }
-
-                                // this.transaksi.append('id_mobil', this.selectedId_mobil);
-                                // this.transaksi.append('tanggal_mulai', this.merge_mulai_sewa);
-                                // this.transaksi.append('tanggal_selesai', this.merge_selesai_sewa);
-                                // this.transaksi.append('total_sewa_mobil', this.totalSewaMobil);
-                                // this.transaksi.append('total_sewa_driver', this.totalSewaDriver);
-                                // this.transaksi.append('total_harga', this.totalHarga);
-                                // this.transaksi.append('potongan_promo', this.totalPromo);
                             }
                             else{
                                 this.error_message = 'Berhasil Menyewa, Silakan Tunggu Verifikasi Customer Service';
@@ -1277,17 +1040,6 @@
                                 this.dialogRatingAJR = true;
                             }
                         }
-                        // this.temp_id_transk = this.transaksis;
-                        // console.log(this.temp_id_transk);
-                        // this.dialogRatingAJR = true;
-                    //     this.resetData();
-                    // })
-                    // .catch(error => {
-                    //     this.error_message = error.response.data.message;
-                    //     this.color = "red";
-                    //     this.snackbar1 = true;
-                    //     this.load = false;
-                    // });
                 }
             },
 
@@ -1296,144 +1048,6 @@
                     name: 'Transaksi',
                 });
             },
-
-            // update() {
-            //     var temp_foto = document.getElementById("file");
-                
-            //     if(temp_foto.files[0]){
-            //         this.mobil.append('url_foto_mobil', temp_foto.files[0]);
-            //     }
-
-            //     if(this.form.id_mitra > 0){
-            //         this.mobil.append('id_mitra', this.form.id_mitra);
-            //     }
-            //     else{
-            //         this.mobil.append('id_mitra', []);
-            //     }
-
-            //     this.mobil.append('kategori_aset', this.form.kategori_aset);
-            //     this.mobil.append('nama_mobil', this.form.nama_mobil);
-            //     this.mobil.append('tipe_mobil', this.form.tipe_mobil);
-            //     this.mobil.append('jenis_transmisi', this.form.jenis_transmisi);
-            //     this.mobil.append('jenis_bahan_bakar', this.form.jenis_bahan_bakar);
-            //     this.mobil.append('warna_mobil', this.form.warna_mobil);
-            //     this.mobil.append('volume_bahan_bakar', this.form.volume_bahan_bakar);
-            //     this.mobil.append('kategori_aset', this.form.kategori_aset);
-            //     this.mobil.append('kapasitas_penumpang', this.form.kapasitas_penumpang);
-            //     this.mobil.append('harga_sewa_mobil', this.form.harga_sewa_mobil);
-            //     this.mobil.append('plat_nomor', this.form.plat_nomor);
-            //     this.mobil.append('nomor_stnk', this.form.nomor_stnk);
-            //     this.mobil.append('status_ketersediaan', this.form.status_ketersediaan);
-            //     // this.mobil.append('url_foto_mobil', this.form.url_foto_mobil);
-            //     this.mobil.append('fasilitas', this.form.fasilitas);
-            //     if(this.form.mulai_kontrak !== null){
-            //         this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
-            //     }
-            //     else{
-            //         this.mobil.append('mulai_kontrak', []);
-            //     }
-            //     // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
-            //     if(this.form.selesai_kontrak !== null){
-            //        this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
-            //     }
-            //     else{
-            //         this.mobil.append('selesai_kontrak', []);
-            //     }
-            //     // this.mobil.append('mulai_kontrak', this.form.mulai_kontrak);
-            //     // this.mobil.append('selesai_kontrak', this.form.selesai_kontrak);
-            //     this.mobil.append('tanggal_servis_terakhir', this.form.tanggal_servis_terakhir);
-
-            //     var url = this.$api + '/mobil/' + this.editId;
-            //     this.load = true;
-            //     this.$http.post(url, this.mobil, {
-            //         headers: {
-            //             'Authorization' : 'Bearer ' +localStorage.getItem('token')
-            //         }
-            //     }).then(response => {
-            //         this.error_message = response.data.message;
-            //         this.snackbar = {
-            //             color: "success",
-            //             icon: "mdi-check-circle",
-            //             mode: "multi-line",
-            //             position: "top",
-            //             timeout: 2000,
-            //             title: "Success",
-            //             visible: true
-            //         };
-            //         this.load = false;
-            //         this.close();
-            //         this.clear();
-            //         var temp_foto = document.getElementById("file");
-                
-            //         if(temp_foto.files[0]){
-            //             this.mobil.append('url_foto_mobil', temp_foto.files[0]);
-            //         }
-            //         this.readData();
-            //         this.resetForm();
-            //         this.inputType = 'Tambah';
-            //     }).catch(error => {
-            //         this.error_message = error.response.data.message;
-            //         this.color = "red";
-            //         this.snackbar1 = true;
-            //         this.load = false;
-            //     });
-            // },
-
-            // deleteData(){
-            //     // Menghapus Data
-            //     var url = this.$api + '/mobil/' + this.deleteId;
-            //     this.load = true;
-            //     this.$http.delete(url, {
-            //         headers: {
-            //             'Authorization' : 'Bearer ' +localStorage.getItem('token')
-            //         }
-            //     }).then(response => {
-            //         this.error_message = response.data.message;
-            //         this.snackbar = {
-            //             color: "success",
-            //             icon: "mdi-check-circle",
-            //             mode: "multi-line",
-            //             position: "top",
-            //             timeout: 2000,
-            //             title: "Success",
-            //             visible: true
-            //         };
-            //         this.load = false;
-            //         this.close();
-            //         this.readData();
-            //         this.resetForm();
-            //         this.inputType = "Tambah";
-            //     }).catch(error => {
-            //         this.error_message = error.response.data.message;
-            //         this.snackbar = {
-            //             color: "error",
-            //             icon: "mdi-alert-circle",
-            //             mode: "multi-line",
-            //             position: "top",
-            //             timeout: 2000,
-            //             title: "Error",
-            //             visible: true
-            //         };
-            //         this.load = false;
-            //         this.clear();
-            //     });
-            // },
-
-            // fungsiTampilValueRadio(item){
-            //     if(item.id_mitra == null){
-            //         this.kategori_aset = 0;
-            //     }
-            //     else{
-            //         this.kategori_aset = 1;
-            //     }
-            // },
-
-            // getFromEdit(){
-            //     export default {
-            //         name: 'TransaksiCustomer',
-            //         props: ['items'],
-            //     };
-            // },
 
             created(){
                 if(this.$route.params.items != null){

@@ -721,10 +721,6 @@ import jspdf from 'jspdf'
                 return false;
             },
 
-            // clear(){
-            //     this.$refs.form.reset();
-            // },
-
             setForm() {
                 if(this.inputType !== 'Tambah'){
                     this.update();
@@ -745,19 +741,6 @@ import jspdf from 'jspdf'
                     this.transaksis = response.data.data;
                 })
             },
-
-            // readDataTransaksi() {
-            //     this.temp_banyak = true;
-            //     var url = this.$api + '/countTransaction/' + sessionStorage.getItem('id_customer');
-            //     console.log(url)
-            //     this.$http.get(url, {
-            //         headers: {
-            //             'Authorization' : 'Bearer ' + localStorage.getItem('token')
-            //         }
-            //     }).then(response => {
-            //         this.transaksis = response.data.data;
-            //     })
-            // },
 
             readDataBanyakTransaksi() {
                 this.temp_banyak = true;
@@ -1045,11 +1028,6 @@ import jspdf from 'jspdf'
                             this.transaksi.append('bukti_bayar', temp_bukti.files[0]);
                         }
                     }
-                    // else{
-                    //     console.log(" DI ELSE")
-                    //     this.transaksi.append('bukti_bayar', null);
-                    // }
-                    // this.transaksi.append('bukti_bayar', this.bukti_bayar);
                     this.transaksi.append('status_transaksi', 'Sudah Bayar, Menunggu Verifikasi');
                     this.transaksi.append('metode_pembayaran', this.metodeBayar);
                     this.transaksi.append('total_denda', this.data.total_denda);
@@ -1116,16 +1094,6 @@ import jspdf from 'jspdf'
                 }
                 else{
                     this.dialogMetodeBayar = true;
-                    // this.snackbar = {
-                    //     color: "info",
-                    //     icon: "mdi-information-outline",
-                    //     mode: "multi-line",
-                    //     position: "top",
-                    //     timeout: 2000,
-                    //     title: "Information",
-                    //     visible: true
-                    // };
-                    // this.error_message = 'MASUK ELSE DONG';
                 }
             },
 

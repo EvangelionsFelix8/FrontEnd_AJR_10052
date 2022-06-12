@@ -9,8 +9,10 @@ Vue.use(EnlargeableImage)
 Vue.config.productionTip = false
 
 Vue.prototype.$http = axios; // code standar untuk menggunakan axios
-Vue.prototype.$api = 'http://127.0.0.1:8000/api'; // link backend
-Vue.prototype.$baseUrl = 'http://127.0.0.1:8000';
+Vue.prototype.$api = 'https://atmajogjarental.felixyehdeya.xyz/api'; // link backend
+Vue.prototype.$baseUrl = 'https://atmajogjarental.felixyehdeya.xyz';
+// Vue.prototype.$api = 'http://127.0.0.1:8000/api'; // link backend
+// Vue.prototype.$baseUrl = 'http://127.0.0.1:8000';
 
 new Vue({
   router,

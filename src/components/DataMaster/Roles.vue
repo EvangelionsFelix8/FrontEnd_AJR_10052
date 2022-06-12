@@ -123,7 +123,7 @@
             save(){
                 this.role.append('nama_role', this.form.nama_role);
 
-                var url = this.$api + '/role/'
+                var url = this.$api + '/role'
                 this.load = true;
                 this.$http.post(url, this.role, {
                     headers: {
